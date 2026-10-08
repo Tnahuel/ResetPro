@@ -14,7 +14,8 @@ def secret_info():
     explicit = os.getenv("JWT_SECRET_KEY")
     if explicit:
         return explicit, "JWT_SECRET_KEY"
-    base = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or ""
+    from .database import raw_database_url
+    base = raw_database_url()[1]
     if base:
         return hashlib.sha256(("resetpro-jwt:" + base).encode()).hexdigest(), "derivada de DATABASE_URL"
     return "solo-para-desarrollo-local", "clave de desarrollo (solo local)"

@@ -21,7 +21,10 @@ def get_db():
         log.exception("No se pudo preparar la base de datos")
         raise HTTPException(
             status_code=503,
-            detail=f"Base de datos no disponible ({type(exc).__name__}). Revisa DATABASE_URL en Vercel.",
+            detail=(
+                str(exc) if isinstance(exc, RuntimeError)
+                else f"Base de datos no disponible ({type(exc).__name__}). Revisa la conexion a Neon en Vercel."
+            ),
         )
     db = factory()
     try:

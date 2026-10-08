@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from . import models, security
-from .database import database_url, get_engine, get_session_factory
+from .database import database_url, get_engine, get_session_factory, raw_database_url
 from .routers import admin, archivos, auth, dietas, profesores, turnos, usuarios
 
 logging.basicConfig(level=logging.INFO)
@@ -46,6 +46,7 @@ def health():
         "db": "error",
         "motor": None,
         "usuarios": None,
+        "variable_db": raw_database_url()[0] or "ninguna",
         "jwt": security.secret_info()[1],
         "detalle": None,
     }

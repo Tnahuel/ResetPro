@@ -13,19 +13,35 @@ _engine = None
 _SessionLocal = None
 
 
+def raw_database_url():
+    """Busca la URL de PostgreSQL. Devuelve (nombre_variable, url) o (None, "")."""
+    for nombre in ("DATABASE_URL", "POSTGRES_URL", "POSTGRES_PRISMA_URL"):
+        valor = (os.getenv(nombre) or "").strip()
+        if valor:
+            return nombre, valor
+    # La integracion de Vercel puede agregar un prefijo propio (STORAGE_URL, NEON_DATABASE_URL, ...).
+    # Se toma cualquier variable cuyo valor sea una URL de Postgres, prefiriendo la "pooled".
+    candidatas = []
+    for nombre, valor in os.environ.items():
+        v = (valor or "").strip()
+        if v.startswith(("postgres://", "postgresql://")):
+            sin_pool = any(x in nombre.upper() for x in ("UNPOOLED", "NON_POOLING", "NO_SSL"))
+            candidatas.append((sin_pool, nombre, v))
+    if candidatas:
+        candidatas.sort(key=lambda c: (c[0], c[1]))
+        return candidatas[0][1], candidatas[0][2]
+    return None, ""
+
+
 def database_url() -> str:
-    url = (
-        os.getenv("DATABASE_URL")
-        or os.getenv("POSTGRES_URL")
-        or os.getenv("POSTGRES_PRISMA_URL")
-        or ""
-    ).strip()
+    _, url = raw_database_url()
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
     if not url:
         if os.getenv("VERCEL"):
             raise RuntimeError(
-                "Falta DATABASE_URL. Conecta la base Neon desde Vercel > Storage."
+                "No se encontro ninguna variable con la URL de PostgreSQL. En Vercel: "
+                "Storage > conecta la base Neon a ESTE proyecto (entorno Production) y hace Redeploy."
             )
         log.warning("Sin DATABASE_URL: usando SQLite local (solo para pruebas).")
         url = "sqlite:////tmp/resetpro_local.db" if os.name != "nt" else "sqlite:///resetpro_local.db"
