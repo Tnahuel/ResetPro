@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ResetPro — Mi panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="Usuario.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="../index.html">
+      <img src="../icono.PNG" alt="ResetPro">
+    </a>
+    <div class="user-box">
+      <div class="avatar" id="userAvatar">··</div>
+      <div class="who">
+        <b id="userName">Cargando...</b>
+        <small>Cuenta usuario</small>
+      </div>
+      <a class="logout" id="btnSalir" href="../index.html">Salir</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="greeting">
+    <h1>Hola, <span id="saludoNombre">...</span> 👋</h1>
+    <p>Esto es lo que tenés hoy en ResetPro.</p>
+  </div>
+
+  <p class="notice" id="aviso" hidden></p>
+
+  <div class="cards">
+
+    <!-- Entrenamiento de la semana -->
+    <section class="card">
+      <div class="card-head">
+        <span class="tag">ENTRENAMIENTO</span>
+        <span class="icon">💪</span>
+      </div>
+      <h2>Entrenamiento de la semana</h2>
+      <p class="sub">Grupo muscular asignado para cada día.</p>
+      <div class="card-body">
+        <div class="week-strip" id="weekStrip"></div>
+        <div class="today-block">
+          <span class="label">Hoy te toca</span>
+          <div class="muscle" id="hoyGrupo">—</div>
+          <span class="note" id="hoyNota">Cargando...</span>
+        </div>
+      </div>
+      <button type="button" class="card-cta" id="btnRutina" disabled>Rutina en PDF no disponible</button>
+    </section>
+
+    <!-- Turno y reserva -->
+    <section class="card">
+      <div class="card-head">
+        <span class="tag">PRÓXIMO TURNO</span>
+        <span class="icon">📅</span>
+      </div>
+      <h2>Turno y reserva</h2>
+      <p class="sub">Tu próxima sesión confirmada.</p>
+      <div class="card-body" id="turnoBody">
+        <p class="empty">Cargando...</p>
+      </div>
+      <button type="button" class="card-cta solid" id="btnCancelar" hidden>Cancelar turno</button>
+    </section>
+
+    <!-- Dieta y macros -->
+    <section class="card">
+      <div class="card-head">
+        <span class="tag">NUTRICIÓN</span>
+        <span class="icon">🥗</span>
+      </div>
+      <h2>Dieta y macros</h2>
+      <p class="sub">Tu plan diario de macronutrientes.</p>
+      <div class="card-body" id="dietaBody">
+        <p class="empty">Cargando...</p>
+      </div>
+      <button type="button" class="card-cta" id="btnDieta" disabled>Plan completo no disponible</button>
+    </section>
+
+  </div>
+</main>
+
+<script src="../resetpro-api.js"></script>
+<script src="usuario.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResetPro — Estado del sistema</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--black:#0B0B0C;--charcoal:#18181B;--gold:#F2A900;--white:#F7F6F2;--grey:#9A9A9F;--line:rgba(247,246,242,.1);--ok:#8FD19E;--err:#F26A6A}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--black);color:var(--white);font-family:Inter,sans-serif;line-height:1.55;padding:40px 20px}
+  main{max-width:640px;margin:0 auto}
+  h1{font-family:Oswald,sans-serif;font-weight:600;font-size:30px;margin:0 0 6px}
+  p.sub{color:var(--grey);margin:0 0 28px}
+  .card{background:var(--charcoal);border:1px solid var(--line);padding:6px 22px;
+    clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px))}
+  .row{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .row:last-child{border-bottom:none}
+  .row span:first-child{color:var(--grey)}
+  .ok{color:var(--ok);font-weight:600}.err{color:var(--err);font-weight:600}
+  .detalle{margin-top:18px;padding:14px 16px;border:1px solid rgba(242,106,106,.45);background:rgba(242,106,106,.06);color:var(--err);font-size:13.5px;word-break:break-word}
+  .links{margin-top:26px;display:flex;gap:18px;flex-wrap:wrap;font-size:14px}
+  a{color:var(--gold)}
+  button{margin-top:22px;background:var(--gold);color:var(--black);border:none;font-weight:600;font-size:14px;padding:12px 20px;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+  <h1>Estado del sistema</h1>
+  <p class="sub">Verificá que el sitio, la API y la base de datos estén funcionando.</p>
+  <div class="card" id="card"><div class="row"><span>Consultando...</span><span></span></div></div>
+  <div id="detalle"></div>
+  <button id="reintentar" type="button">Volver a comprobar</button>
+  <div class="links">
+    <a href="index.html">Ir al sitio</a>
+    <a href="login-usuario.html">Ingreso usuario</a>
+    <a href="login-profesor.html">Ingreso profesor / admin</a>
+    <a href="/api/docs">Documentación API</a>
+  </div>
+</main>
+<script>
+  const card = document.getElementById("card");
+  const det = document.getElementById("detalle");
+  const fila = (k, v, cls) => `<div class="row"><span>${k}</span><span class="${cls || ""}">${v}</span></div>`;
+
+  async function comprobar() {
+    card.innerHTML = fila("Consultando...", "");
+    det.innerHTML = "";
+    let html = fila("Sitio (frontend)", "OK", "ok");
+    try {
+      const t0 = performance.now();
+      const res = await fetch("/api/health");
+      const ms = Math.round(performance.now() - t0);
+      const d = await res.json();
+      html += fila("API (backend)", d.api === "ok" ? "OK · " + ms + " ms" : "Error", d.api === "ok" ? "ok" : "err");
+      html += fila("Base de datos", d.db === "ok" ? "Conectada (" + (d.motor || "?") + ")" : "Sin conexión", d.db === "ok" ? "ok" : "err");
+      if (d.usuarios !== null) html += fila("Alumnos cargados", d.usuarios);
+      html += fila("Clave de sesión (JWT)", d.jwt);
+      if (d.motor === "sqlite") html += fila("Aviso", "SQLite es solo para pruebas locales", "err");
+      if (d.detalle) det.innerHTML = `<div class="detalle">${d.detalle.replace(/</g, "&lt;")}</div>`;
+    } catch (e) {
+      html += fila("API (backend)", "No responde", "err");
+      det.innerHTML = `<div class="detalle">No se pudo llegar a /api/health. Si estás en Vercel, revisá que el despliegue haya terminado y que el proyecto use Framework Preset "Other".</div>`;
+    }
+    card.innerHTML = html;
+  }
+  document.getElementById("reintentar").addEventListener("click", comprobar);
+  comprobar();
+</script>
+</body>
+</html>

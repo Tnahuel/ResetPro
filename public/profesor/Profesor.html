@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ResetPro — Panel del Profesor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="Profesor.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="../index.html">
+      <img src="../icono.PNG" alt="ResetPro">
+      <span>RESETPRO</span>
+    </a>
+    <div class="user-box">
+      <div class="avatar" id="userAvatar">··</div>
+      <div class="who">
+        <b id="userName">Cargando...</b>
+        <small>Cuenta profesor</small>
+      </div>
+      <a class="logout" id="btnSalir" href="../index.html">Salir</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="greeting">
+    <h1>Hola, <span id="saludoNombre">...</span> 👋</h1>
+    <p>Esta es tu agenda de entrenamientos de los próximos días.</p>
+  </div>
+
+  <p class="notice" id="aviso" hidden></p>
+
+  <div class="stats-row">
+    <div class="stat-chip"><b id="statHoy">–</b><span>Alumnos hoy</span></div>
+    <div class="stat-chip"><b id="statSemana">–</b><span>Turnos próximos 7 días</span></div>
+    <div class="stat-chip"><b id="statSinRutina">–</b><span>Sin rutina cargada</span></div>
+  </div>
+
+  <section class="section-block">
+    <div class="section-head">
+      <h2>Tus alumnos</h2>
+      <p>Grupo muscular, horario y rutina en PDF de cada sesión.</p>
+    </div>
+    <div class="alumnos-list" id="alumnosList">
+      <p class="empty">Cargando agenda...</p>
+    </div>
+  </section>
+
+</main>
+
+<input type="file" id="fileInput" accept="application/pdf" hidden>
+
+<script src="../resetpro-api.js"></script>
+<script src="profesor.js"></script>
+</body>
+</html>
