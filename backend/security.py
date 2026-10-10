@@ -33,6 +33,11 @@ def verify_password(password: str, password_hash: str) -> bool:
         return False
 
 
+def hash_token(token: str) -> str:
+    """Hash del token de recuperacion: en la base nunca queda el token en claro."""
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
 def create_access_token(data: dict) -> str:
     payload = data.copy()
     payload["exp"] = datetime.now(timezone.utc) + timedelta(minutes=EXPIRE_MINUTES)

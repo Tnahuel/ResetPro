@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..deps import get_current_payload, get_db, require_role
 from ..serializers import turno_out
+from ..utils import hoy_local
 
 router = APIRouter(prefix="/turnos", tags=["turnos"])
 
@@ -21,6 +22,19 @@ def asignar_turno(
     if not db.get(models.Profesor, payload.profesor_id):
         raise HTTPException(status_code=404, detail="El profesor no existe")
 
+    reemplazados = 0
+    if payload.reemplazar:
+        # El turno nuevo "pisa" a los proximos del alumno (queda el historial como cancelado).
+        proximos = db.query(models.Turno).filter(
+            models.Turno.usuario_id == payload.usuario_id,
+            models.Turno.fecha >= hoy_local(),
+            models.Turno.estado.in_([models.EstadoTurnoEnum.pendiente, models.EstadoTurnoEnum.confirmado]),
+        ).all()
+        for t in proximos:
+            t.estado = models.EstadoTurnoEnum.cancelado
+        reemplazados = len(proximos)
+        db.flush()
+
     ocupado = db.query(models.Turno).filter(
         models.Turno.profesor_id == payload.profesor_id,
         models.Turno.fecha == payload.fecha,
@@ -30,11 +44,13 @@ def asignar_turno(
     if ocupado:
         raise HTTPException(status_code=409, detail="El profesor ya tiene un turno en ese horario")
 
-    turno = models.Turno(**payload.model_dump(), estado=models.EstadoTurnoEnum.confirmado)
+    turno = models.Turno(**payload.model_dump(exclude={"reemplazar"}), estado=models.EstadoTurnoEnum.confirmado)
     db.add(turno)
     db.commit()
     db.refresh(turno)
-    return turno_out(turno)
+    salida = turno_out(turno)
+    salida.reemplazados = reemplazados
+    return salida
 
 
 @router.get("", response_model=List[schemas.TurnoOut])

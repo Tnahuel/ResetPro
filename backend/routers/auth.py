@@ -1,10 +1,14 @@
-from datetime import datetime
+import secrets
+from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, security
+from .. import email_utils, models, schemas, security
 from ..deps import get_current_payload, get_db
+from ..utils import base_url
+
+MINUTOS_EMAIL = 60
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -49,3 +53,86 @@ def cambiar_password(
     cred.contrasena_hash = security.hash_password(payload.password_nueva)
     db.commit()
     return {"ok": True}
+
+
+def _perfil(cred):
+    return {
+        models.RolEnum.usuario: cred.usuario,
+        models.RolEnum.profesor: cred.profesor,
+        models.RolEnum.admin: cred.administrador,
+    }.get(cred.rol)
+
+
+@router.post("/olvide-password")
+def olvide_password(payload: schemas.OlvidePasswordRequest, request: Request, db: Session = Depends(get_db)):
+    """Pide un enlace para crear una contrasena nueva.
+    Responde siempre lo mismo exista o no el email (no revela que cuentas existen)."""
+    canal = "email" if email_utils.proveedor() else "administrador"
+
+    cred = db.query(models.Credenciales).filter(
+        models.Credenciales.email == payload.email.lower()
+    ).first()
+    if cred:
+        ahora = datetime.utcnow()
+        # Freno basico: un pedido cada 2 minutos por cuenta.
+        reciente = db.query(models.Recuperacion).filter(
+            models.Recuperacion.credenciales_id == cred.id,
+            models.Recuperacion.usado_en.is_(None),
+            models.Recuperacion.creado_en >= ahora - timedelta(minutes=2),
+        ).first()
+        if not reciente:
+            token = secrets.token_urlsafe(32)
+            rec = models.Recuperacion(
+                credenciales_id=cred.id,
+                token_hash=security.hash_token(token),
+                expira_en=ahora + timedelta(minutes=MINUTOS_EMAIL),
+                origen="usuario",
+                enviado=False,
+            )
+            db.add(rec)
+            db.commit()
+
+            sitio = base_url(request)
+            if canal == "email" and sitio:
+                perfil = _perfil(cred)
+                nombre = perfil.nombre if perfil else cred.email
+                enlace = f"{sitio}/restablecer.html?token={token}"
+                asunto, texto, cuerpo = email_utils.plantilla_recuperacion(nombre, enlace, MINUTOS_EMAIL)
+                if email_utils.enviar(cred.email, asunto, texto, cuerpo):
+                    rec.enviado = True
+                    db.commit()
+    return {"ok": True, "canal": canal}
+
+
+def _recuperacion_vigente(db: Session, token: str):
+    rec = db.query(models.Recuperacion).filter(
+        models.Recuperacion.token_hash == security.hash_token(token)
+    ).first()
+    if not rec or rec.usado_en is not None or rec.expira_en < datetime.utcnow():
+        return None
+    return rec
+
+
+@router.post("/validar-recuperacion")
+def validar_recuperacion(payload: schemas.ValidarRecuperacionRequest, db: Session = Depends(get_db)):
+    rec = _recuperacion_vigente(db, payload.token)
+    return {"valido": rec is not None}
+
+
+@router.post("/restablecer-password")
+def restablecer_password(payload: schemas.RestablecerPasswordRequest, db: Session = Depends(get_db)):
+    rec = _recuperacion_vigente(db, payload.token)
+    if rec is None:
+        raise HTTPException(status_code=400, detail="El enlace no es valido o ya vencio. Pedi uno nuevo.")
+    cred = db.get(models.Credenciales, rec.credenciales_id)
+    if cred is None:
+        raise HTTPException(status_code=400, detail="La cuenta ya no existe.")
+
+    cred.contrasena_hash = security.hash_password(payload.password_nueva)
+    # Este enlace y cualquier otro pendiente de la cuenta quedan inutilizados.
+    db.query(models.Recuperacion).filter(
+        models.Recuperacion.credenciales_id == cred.id,
+        models.Recuperacion.usado_en.is_(None),
+    ).update({"usado_en": datetime.utcnow()}, synchronize_session=False)
+    db.commit()
+    return {"ok": True, "rol": cred.rol.value}

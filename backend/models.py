@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
-    Column, Date, DateTime, Enum as SqlEnum, Float, ForeignKey, Integer,
+    Boolean, Column, Date, DateTime, Enum as SqlEnum, Float, ForeignKey, Integer,
     LargeBinary, String,
 )
 from sqlalchemy.orm import deferred, relationship
@@ -144,3 +144,19 @@ class Archivo(Base):
     contenido = deferred(Column(LargeBinary, nullable=False))
 
     usuario = relationship("Usuario", back_populates="archivos")
+
+
+class Recuperacion(Base):
+    """Enlaces de recuperacion de contrasena. Se guarda solo el hash del token."""
+    __tablename__ = "recuperaciones"
+
+    id = Column(Integer, primary_key=True, index=True)
+    credenciales_id = Column(Integer, ForeignKey("credenciales.id", ondelete="CASCADE"), nullable=False, index=True)
+    token_hash = Column(String(64), unique=True, nullable=False, index=True)
+    creado_en = Column(DateTime, default=datetime.utcnow)
+    expira_en = Column(DateTime, nullable=False)
+    usado_en = Column(DateTime)
+    enviado = Column(Boolean, default=False)       # True si el email salio o lo genero un admin
+    origen = Column(String(20), default="usuario")  # "usuario" (olvide mi clave) | "admin"
+
+    credenciales = relationship("Credenciales")

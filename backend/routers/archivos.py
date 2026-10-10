@@ -35,6 +35,21 @@ async def subir_archivo(
         mime="application/pdf", tamano=len(contenido), contenido=contenido,
     )
     db.add(registro)
+    db.flush()
+
+    # El archivo nuevo REEMPLAZA al anterior del mismo tipo: se borran los viejos.
+    previos = db.query(models.Archivo.id, models.Archivo.nombre).filter(
+        models.Archivo.usuario_id == usuario_id,
+        models.Archivo.tipo == tipo,
+        models.Archivo.id != registro.id,
+    ).order_by(models.Archivo.id.desc()).all()
+    reemplazo = previos[0].nombre if previos else None
+    if previos:
+        db.query(models.Archivo).filter(
+            models.Archivo.usuario_id == usuario_id,
+            models.Archivo.tipo == tipo,
+            models.Archivo.id != registro.id,
+        ).delete(synchronize_session=False)
 
     if tipo == "dieta":
         dieta = (
@@ -48,7 +63,8 @@ async def subir_archivo(
 
     db.commit()
     db.refresh(registro)
-    return {"id": registro.id, "nombre": registro.nombre, "tipo": registro.tipo, "usuario_id": usuario_id}
+    return {"id": registro.id, "nombre": registro.nombre, "tipo": registro.tipo,
+            "usuario_id": usuario_id, "reemplazo": reemplazo}
 
 
 @router.get("/{archivo_id}")

@@ -29,13 +29,43 @@ function agregarLog(html, esError = false) {
 }
 
 const estadoClase = { confirmado: "active", completado: "active", pendiente: "pending", cancelado: "paused", sin_turnos: "paused" };
-const estadoTexto = { confirmado: "Activo", completado: "Activo", pendiente: "Pendiente", cancelado: "Cancelado", sin_turnos: "Sin turnos" };
+const estadoTexto = { confirmado: "Confirmado", completado: "Completado", pendiente: "Pendiente", cancelado: "Cancelado", sin_turnos: "Sin turnos" };
+const tipoTurnoTexto = { proximo: "Próximo", ultimo: "Último", cancelado: "Cancelado" };
+const rolTexto = { usuario: "Alumno", profesor: "Profesor", admin: "Administrador" };
 
 function fechaCorta(iso) {
   if (!iso) return "—";
   const d = new Date(iso);
   return d.toLocaleDateString("es-AR", { day: "2-digit", month: "short" }) + " " +
     d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function fechaTurno(iso, hora) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const f = new Date(y, m - 1, d);
+  return f.toLocaleDateString("es-AR", { day: "2-digit", month: "short" }) + " " + hora;
+}
+
+function haceCuanto(iso) {
+  const min = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (min < 1) return "recién";
+  if (min < 60) return "hace " + min + " min";
+  if (min < 1440) return "hace " + Math.round(min / 60) + " h";
+  return "hace " + Math.round(min / 1440) + " días";
+}
+
+function celdaArchivo(a) {
+  if (!a) return "—";
+  return `<button type="button" class="file-link" data-archivo="${a.id}" data-nombre="${escapeHTML(a.nombre)}">${escapeHTML(a.nombre)}</button>` +
+         `<span class="cell-sub">Subido ${escapeHTML(fechaCorta(a.creado_en))}</span>`;
+}
+
+function celdaDieta(e) {
+  const m = e.macros;
+  const macros = m ? `P ${Math.round(m.proteina)} · C ${Math.round(m.carbohidratos)} · G ${Math.round(m.grasas)} g` : "";
+  const pdf = e.dieta_pdf ? celdaArchivo(e.dieta_pdf) : "";
+  if (!macros && !pdf) return "—";
+  return (macros ? `<span>${escapeHTML(macros)}</span>` : "") + (pdf ? `<span class="cell-sub">${pdf}</span>` : "");
 }
 
 function llenarSelect(select, items, vacioTexto) {
@@ -52,6 +82,110 @@ function llenarSelect(select, items, vacioTexto) {
   });
 }
 
+function botonesAccion(rol, id, nombre, aviso) {
+  return `<div class="acciones">
+    <button type="button" class="act-btn" data-accion="enlace" data-rol="${rol}" data-id="${id}" data-nombre="${escapeHTML(nombre)}">Enlace de clave</button>
+    <button type="button" class="act-btn danger" data-accion="eliminar" data-rol="${rol}" data-id="${id}" data-nombre="${escapeHTML(nombre)}" data-aviso="${escapeHTML(aviso || "")}">Eliminar</button>
+  </div>`;
+}
+
+// ---------- Recuperacion de contrasenas ----------
+function mostrarEnlace(titulo, token) {
+  const url = location.origin + "/restablecer.html?token=" + encodeURIComponent(token);
+  document.getElementById("enlaceTitulo").textContent = titulo;
+  document.getElementById("enlaceInput").value = url;
+  const box = document.getElementById("enlaceBox");
+  box.hidden = false;
+  box.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+document.getElementById("btnCopiar").addEventListener("click", async () => {
+  const input = document.getElementById("enlaceInput");
+  const btn = document.getElementById("btnCopiar");
+  try {
+    await navigator.clipboard.writeText(input.value);
+  } catch (e) {
+    input.select();
+    document.execCommand("copy");
+  }
+  btn.textContent = "¡Copiado!";
+  setTimeout(() => (btn.textContent = "Copiar enlace"), 1800);
+});
+
+async function generarEnlace(rol, id, nombre, boton) {
+  if (boton) boton.disabled = true;
+  try {
+    const r = await apiFetch("/admin/enlace-recuperacion", { method: "POST", body: JSON.stringify({ rol, id: Number(id) }) });
+    mostrarEnlace(`Enlace para ${r.nombre} (${r.email}) · válido 24 horas`, r.token);
+    agregarLog(`Enlace de recuperación generado para <b>${escapeHTML(r.nombre)}</b>`);
+    await cargarSolicitudes();
+  } catch (err) {
+    agregarLog("No se pudo generar el enlace: " + escapeHTML(err.message), true);
+  } finally {
+    if (boton) boton.disabled = false;
+  }
+}
+
+async function cargarSolicitudes() {
+  const cont = document.getElementById("listaSolicitudes");
+  try {
+    const lista = await apiFetch("/admin/recuperaciones");
+    if (!lista.length) {
+      cont.innerHTML = `<p class="hint">No hay solicitudes pendientes.</p>`;
+      return;
+    }
+    cont.innerHTML = lista.map((s, i) => `
+      <div class="solicitud">
+        <span><b>${escapeHTML(s.nombre)}</b> · ${escapeHTML(s.email)}
+          <span class="cell-sub">${escapeHTML(rolTexto[s.rol] || s.rol)} · ${escapeHTML(haceCuanto(s.creado_en))}</span></span>
+        <button type="button" class="act-btn" data-sol="${i}">Generar enlace</button>
+      </div>`).join("");
+    cont.querySelectorAll("button[data-sol]").forEach((b) => {
+      const s = lista[Number(b.dataset.sol)];
+      b.addEventListener("click", () => generarEnlace(s.rol, s.perfil_id, s.nombre, b));
+    });
+  } catch (e) {
+    cont.innerHTML = `<p class="hint">No se pudieron cargar las solicitudes: ${escapeHTML(e.message)}</p>`;
+  }
+}
+
+// ---------- Eliminar ----------
+async function eliminar(rol, id, nombre, aviso, boton) {
+  const tipo = rol === "usuario" ? "al alumno" : "al profesor";
+  const detalle = rol === "usuario"
+    ? "Se borrarán también su cuenta, turnos, plan nutricional y PDFs."
+    : "Se borrarán también su cuenta y los turnos que tenía asignados." + (aviso ? "\n" + aviso : "");
+  if (!confirm(`¿Eliminar ${tipo} ${nombre}?\n\n${detalle}\n\nEsta acción no se puede deshacer.`)) return;
+
+  boton.disabled = true;
+  try {
+    const ruta = rol === "usuario" ? "/admin/usuarios/" : "/admin/profesores/";
+    const r = await apiFetch(ruta + id, { method: "DELETE" });
+    const t = r.eliminados && r.eliminados.turnos ? ` (y ${r.eliminados.turnos} turno${r.eliminados.turnos > 1 ? "s" : ""})` : "";
+    agregarLog(`Se eliminó ${rol === "usuario" ? "al alumno" : "al profesor"} <b>${escapeHTML(r.nombre)}</b>${t}`);
+    await refrescarTodo();
+  } catch (err) {
+    agregarLog("No se pudo eliminar: " + escapeHTML(err.message), true);
+    boton.disabled = false;
+  }
+}
+
+// Un solo manejador para los botones de ambas tablas
+document.addEventListener("click", (ev) => {
+  const btn = ev.target.closest("button[data-accion]");
+  if (!btn) return;
+  const { accion, rol, id, nombre, aviso } = btn.dataset;
+  if (accion === "enlace") generarEnlace(rol, id, nombre, btn);
+  if (accion === "eliminar") eliminar(rol, id, nombre, aviso, btn);
+});
+
+document.addEventListener("click", (ev) => {
+  const b = ev.target.closest("button[data-archivo]");
+  if (!b) return;
+  descargarArchivo(b.dataset.archivo, b.dataset.nombre)
+    .catch((err) => agregarLog("No se pudo descargar: " + escapeHTML(err.message), true));
+});
+
 // ---------- Carga de datos ----------
 async function cargarStats() {
   try {
@@ -66,41 +200,88 @@ async function cargarStats() {
   }
 }
 
+let estudiantesCache = [];
+
+function actualizarHintArchivos() {
+  const hint = document.getElementById("archivosActuales");
+  const id = parseInt(document.getElementById("macroAlumno").value, 10);
+  const e = estudiantesCache.find((x) => x.id === id);
+  if (!e) { hint.textContent = ""; return; }
+  hint.textContent =
+    "Rutina actual: " + (e.rutina ? e.rutina.nombre : "ninguna") +
+    " · Dieta actual: " + (e.dieta_pdf ? e.dieta_pdf.nombre : "ninguna");
+}
+
 async function cargarEstudiantes() {
   const tbody = document.getElementById("tbodyEstudiantes");
   try {
     const lista = await apiFetch("/admin/estudiantes-detalle");
-    tbody.innerHTML = lista.length ? "" : `<tr><td colspan="6">Todavía no hay alumnos registrados.</td></tr>`;
+    estudiantesCache = lista;
+    tbody.innerHTML = lista.length ? "" : `<tr><td colspan="9">Todavía no hay alumnos registrados.</td></tr>`;
     lista.forEach((e) => {
+      const t = e.turno;
+      const turnoHTML = t
+        ? `${escapeHTML(fechaTurno(t.fecha, t.hora))}<span class="cell-sub">${escapeHTML(tipoTurnoTexto[t.tipo] || "")}</span>`
+        : "—";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(e.nombre))}</span>${escapeHTML(e.nombre)}</td>
+        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(e.nombre))}</span>
+          <span>${escapeHTML(e.nombre)}<span class="cell-sub">${escapeHTML(e.email || "")}</span></span></td>
         <td>${escapeHTML(e.grupo_muscular || "—")}</td>
-        <td>${escapeHTML(e.profesor || "—")}</td>
-        <td>${escapeHTML(e.ultimo_turno || "—")}</td>
+        <td>${escapeHTML((t && t.profesor) || "—")}</td>
+        <td>${turnoHTML}</td>
+        <td>${celdaArchivo(e.rutina)}</td>
+        <td>${celdaDieta(e)}</td>
         <td>${e.activo_semana ? "● " : ""}${escapeHTML(fechaCorta(e.ultimo_acceso))}</td>
-        <td><span class="status ${estadoClase[e.estado] || "paused"}">${escapeHTML(estadoTexto[e.estado] || e.estado)}</span></td>`;
+        <td><span class="status ${estadoClase[e.estado] || "paused"}">${escapeHTML(estadoTexto[e.estado] || e.estado)}</span></td>
+        <td>${botonesAccion("usuario", e.id, e.nombre)}</td>`;
       tbody.appendChild(tr);
     });
+
     const opciones = lista.map((e) => ({ id: e.id, nombre: e.nombre }));
-    llenarSelect(document.getElementById("turnoAlumno"), opciones, "No hay alumnos");
-    llenarSelect(document.getElementById("macroAlumno"), opciones, "No hay alumnos");
+    const selTurno = document.getElementById("turnoAlumno");
+    const selMacro = document.getElementById("macroAlumno");
+    const prevTurno = selTurno.value, prevMacro = selMacro.value;
+    llenarSelect(selTurno, opciones, "No hay alumnos");
+    llenarSelect(selMacro, opciones, "No hay alumnos");
+    if (prevTurno && opciones.some((o) => String(o.id) === prevTurno)) selTurno.value = prevTurno;
+    if (prevMacro && opciones.some((o) => String(o.id) === prevMacro)) selMacro.value = prevMacro;
+    actualizarHintArchivos();
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="6">No se pudo cargar la lista: ${escapeHTML(e.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9">No se pudo cargar la lista: ${escapeHTML(e.message)}</td></tr>`;
   }
 }
 
 async function cargarProfesores() {
+  const tbody = document.getElementById("tbodyProfesores");
   try {
-    const profes = await apiFetch("/profesores");
-    llenarSelect(document.getElementById("turnoProfesor"), profes, "No hay profesores");
+    const profes = await apiFetch("/admin/profesores-detalle");
+    tbody.innerHTML = profes.length ? "" : `<tr><td colspan="5">Todavía no hay profesores registrados.</td></tr>`;
+    profes.forEach((p) => {
+      const aviso = p.turnos_total
+        ? `Tiene ${p.turnos_total} turno${p.turnos_total > 1 ? "s" : ""} en total (${p.turnos_proximos} próximo${p.turnos_proximos === 1 ? "" : "s"}) que se van a borrar.`
+        : "";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(p.nombre))}</span>
+          <span>${escapeHTML(p.nombre)}<span class="cell-sub">${escapeHTML(p.email || "")}</span></span></td>
+        <td>${escapeHTML(p.especialidad || "—")}</td>
+        <td>${p.turnos_proximos}<span class="cell-sub">${p.alumnos_proximos} alumno${p.alumnos_proximos === 1 ? "" : "s"}</span></td>
+        <td>${p.activo_semana ? "● " : ""}${escapeHTML(fechaCorta(p.ultimo_acceso))}</td>
+        <td>${botonesAccion("profesor", p.id, p.nombre, aviso)}</td>`;
+      tbody.appendChild(tr);
+    });
+    const selProfe = document.getElementById("turnoProfesor");
+    const prev = selProfe.value;
+    llenarSelect(selProfe, profes.map((p) => ({ id: p.id, nombre: p.nombre })), "No hay profesores");
+    if (prev && profes.some((p) => String(p.id) === prev)) selProfe.value = prev;
   } catch (e) {
-    agregarLog("No se pudieron cargar los profesores: " + escapeHTML(e.message), true);
+    tbody.innerHTML = `<tr><td colspan="5">No se pudo cargar la lista: ${escapeHTML(e.message)}</td></tr>`;
   }
 }
 
 function refrescarTodo() {
-  return Promise.all([cargarStats(), cargarEstudiantes(), cargarProfesores()]);
+  return Promise.all([cargarStats(), cargarEstudiantes(), cargarProfesores(), cargarSolicitudes()]);
 }
 
 if (sesion) refrescarTodo();
@@ -184,15 +365,17 @@ formTurno.addEventListener("submit", async (e) => {
   const btn = formTurno.querySelector(".btn-primary");
   btn.disabled = true;
   try {
-    await apiFetch("/turnos", {
+    const reemplazar = document.getElementById("turnoReemplazar").checked;
+    const resp = await apiFetch("/turnos", {
       method: "POST",
-      body: JSON.stringify({ usuario_id, profesor_id, fecha, rango_horario: hora, grupo_muscular: grupo || null }),
+      body: JSON.stringify({ usuario_id, profesor_id, fecha, rango_horario: hora, grupo_muscular: grupo || null, reemplazar }),
     });
     const item = document.createElement("div");
     item.className = "mini-item";
     item.innerHTML = `<span>${escapeHTML(alumno)} con ${escapeHTML(profe)}</span><span class="role-badge">${escapeHTML(fecha)} · ${escapeHTML(hora)}</span>`;
     turnosRecientes.appendChild(item);
-    agregarLog(`Turno asignado: <b>${escapeHTML(alumno)}</b> con <b>${escapeHTML(profe)}</b>, ${escapeHTML(hora)} hs`);
+    agregarLog(`Turno asignado: <b>${escapeHTML(alumno)}</b> con <b>${escapeHTML(profe)}</b>, ${escapeHTML(hora)} hs` +
+      (resp.reemplazados ? ` (reemplazó ${resp.reemplazados} turno${resp.reemplazados > 1 ? "s" : ""} próximo${resp.reemplazados > 1 ? "s" : ""})` : ""));
     formTurno.reset();
     await Promise.all([cargarStats(), cargarEstudiantes(), cargarProfesores()]);
   } catch (err) {
@@ -246,13 +429,13 @@ formMacros.addEventListener("submit", async (e) => {
   const hecho = [];
   try {
     if (hayMacros) {
-      const limpio = JSON.parse(JSON.stringify(datos));
-      await apiFetch("/dietas/usuario/" + usuario_id, { method: "POST", body: JSON.stringify(limpio) });
+      await apiFetch("/dietas/usuario/" + usuario_id, { method: "POST", body: JSON.stringify(datos) });
       hecho.push("macros y micros");
     }
     if (archivo) {
-      await subirArchivo(usuario_id, tipo, archivo);
-      hecho.push(tipo === "rutina" ? "rutina en PDF" : "dieta en PDF");
+      const r = await subirArchivo(usuario_id, tipo, archivo);
+      hecho.push((tipo === "rutina" ? "rutina en PDF" : "dieta en PDF") +
+        (r.reemplazo ? ` (reemplazó a ${escapeHTML(r.reemplazo)})` : ""));
     }
     agregarLog(`Guardado para <b>${escapeHTML(alumno)}</b>: ${hecho.join(" y ")}`);
     formMacros.reset();
@@ -264,3 +447,5 @@ formMacros.addEventListener("submit", async (e) => {
     btn.disabled = false;
   }
 });
+
+document.getElementById("macroAlumno").addEventListener("change", actualizarHintArchivos);

@@ -87,3 +87,15 @@ CREATE TABLE archivos (
     contenido   BYTEA NOT NULL
 );
 CREATE INDEX ix_archivos_usuario ON archivos(usuario_id);
+
+CREATE TABLE recuperaciones (
+    id               SERIAL PRIMARY KEY,
+    credenciales_id  INTEGER NOT NULL REFERENCES credenciales(id) ON DELETE CASCADE,
+    token_hash       VARCHAR(64) UNIQUE NOT NULL,
+    creado_en        TIMESTAMP DEFAULT NOW(),
+    expira_en        TIMESTAMP NOT NULL,
+    usado_en         TIMESTAMP,
+    enviado          BOOLEAN DEFAULT FALSE,
+    origen           VARCHAR(20) DEFAULT 'usuario'
+);
+CREATE INDEX ix_recuperaciones_cred ON recuperaciones(credenciales_id);

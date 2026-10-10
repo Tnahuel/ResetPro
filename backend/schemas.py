@@ -86,6 +86,8 @@ class TurnoCreate(BaseModel):
     fecha: date
     rango_horario: str = Field(pattern=r"^\d{2}:\d{2}$")
     grupo_muscular: Optional[str] = Field(default=None, max_length=60)
+    # True: los turnos proximos que el alumno ya tenia se cancelan y este los reemplaza.
+    reemplazar: bool = False
 
 
 class TurnoOut(BaseModel):
@@ -99,6 +101,7 @@ class TurnoOut(BaseModel):
     estado: str
     grupo_muscular: Optional[str] = None
     nota: Optional[int] = None
+    reemplazados: int = 0
 
 
 class ProfesorOut(BaseModel):
@@ -119,3 +122,21 @@ class CalificarAlumnoRequest(BaseModel):
 
 class RegistrarHorasRequest(BaseModel):
     horas: float = Field(gt=0, le=24)
+
+
+class OlvidePasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class RestablecerPasswordRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    password_nueva: str = Field(min_length=6, max_length=72)
+
+
+class ValidarRecuperacionRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+
+
+class EnlaceRecuperacionRequest(BaseModel):
+    rol: Literal["usuario", "profesor", "admin"]
+    id: int

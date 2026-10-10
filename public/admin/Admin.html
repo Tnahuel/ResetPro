@@ -133,6 +133,11 @@
             </select>
           </div>
         </div>
+        <label class="check-row" for="turnoReemplazar">
+          <input type="checkbox" id="turnoReemplazar" checked>
+          Reemplazar los turnos próximos de este alumno
+        </label>
+        <p class="hint">Si lo destildás, este turno se suma como uno adicional.</p>
         <button type="submit" class="btn-primary">Asignar turno</button>
       </form>
 
@@ -144,12 +149,13 @@
     <section class="card">
       <div class="card-head">
         <h2>Macros, micros y PDF por alumno</h2>
-        <p>Cargá el plan nutricional y adjuntá la rutina o la dieta en PDF (hasta 4 MB).</p>
+        <p>Cargá el plan nutricional y adjuntá la rutina o la dieta en PDF (hasta 4 MB). Un PDF nuevo reemplaza al anterior.</p>
       </div>
       <form id="formMacros" novalidate>
         <div class="field">
           <label for="macroAlumno">Alumno</label>
           <select id="macroAlumno"><option value="">Cargando alumnos...</option></select>
+          <p class="hint" id="archivosActuales"></p>
         </div>
         <div class="field-row three">
           <div class="field">
@@ -201,16 +207,64 @@
             <th>Alumno</th>
             <th>Grupo muscular</th>
             <th>Profesor</th>
-            <th>Último turno</th>
+            <th>Turno vigente</th>
+            <th>Rutina (PDF)</th>
+            <th>Dieta y macros</th>
             <th>Último acceso</th>
             <th>Estado</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody id="tbodyEstudiantes">
-          <tr><td colspan="6">Cargando estudiantes...</td></tr>
+          <tr><td colspan="9">Cargando estudiantes...</td></tr>
         </tbody>
       </table>
     </div>
+  </section>
+
+  <!-- Profesores -->
+  <section class="card full">
+    <div class="card-head">
+      <h2>Profesores</h2>
+      <p>Profesores de la plataforma. Eliminar uno borra también los turnos que tenía asignados.</p>
+    </div>
+    <div class="table-wrap">
+      <table id="tablaProfesores">
+        <thead>
+          <tr>
+            <th>Profesor</th>
+            <th>Especialidad</th>
+            <th>Turnos próximos</th>
+            <th>Último acceso</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyProfesores">
+          <tr><td colspan="5">Cargando profesores...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Recuperacion de contrasenas -->
+  <section class="card full" id="recuperacion">
+    <div class="card-head">
+      <h2>Recuperación de contraseñas</h2>
+      <p>Pedidos de “olvidé mi contraseña” que no salieron por email, y enlaces para que una persona cree su clave nueva.</p>
+    </div>
+
+    <div class="enlace-box" id="enlaceBox" hidden>
+      <span class="mini-list-label" id="enlaceTitulo"></span>
+      <div class="enlace-row">
+        <input type="text" id="enlaceInput" readonly>
+        <button type="button" class="btn-primary" id="btnCopiar">Copiar enlace</button>
+      </div>
+      <p class="hint">Vale 24 horas y se usa una sola vez. Enviáselo por WhatsApp o mail. Generar uno nuevo anula los anteriores.</p>
+    </div>
+
+    <span class="mini-list-label">Solicitudes pendientes</span>
+    <div id="listaSolicitudes"><p class="hint">Cargando...</p></div>
+    <p class="hint">También podés generar un enlace para cualquier alumno o profesor con el botón “Enlace de clave” de sus tablas.</p>
   </section>
 
 </main>

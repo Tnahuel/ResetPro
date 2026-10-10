@@ -101,7 +101,7 @@ def panel_usuario(usuario_id: int, db: Session = Depends(get_db), sesion: dict =
 
     dieta = (
         db.query(models.Dieta).filter(models.Dieta.usuario_id == usuario_id)
-        .order_by(models.Dieta.actualizado_en.desc()).first()
+        .order_by(models.Dieta.id.desc()).first()
     )
 
     def ultimo_archivo(tipo):

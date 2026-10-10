@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>ResetPro — Nueva contraseña</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="recuperar.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <img src="icono.PNG" alt="ResetPro">
+    <span>RESETPRO</span>
+  </a>
+  <a class="back" href="index.html">Volver al inicio</a>
+</header>
+
+<main class="login-wrap">
+  <div class="login-card">
+    <div class="login-tag">NUEVA CONTRASEÑA</div>
+    <h1>Creá tu nueva contraseña</h1>
+
+    <p class="sub" id="cargando">Verificando el enlace...</p>
+
+    <form id="resForm" novalidate hidden>
+      <p class="sub">Elegí una contraseña de al menos 6 caracteres.</p>
+      <label for="pass1">Nueva contraseña</label>
+      <input type="password" id="pass1" placeholder="••••••••" autocomplete="new-password" minlength="6" required>
+      <label for="pass2">Repetí la contraseña</label>
+      <input type="password" id="pass2" placeholder="••••••••" autocomplete="new-password" minlength="6" required>
+      <p class="error" id="resError"></p>
+      <button type="submit" class="btn-primary">Guardar contraseña</button>
+    </form>
+
+    <div id="invalido" hidden>
+      <p class="msg-err">El enlace no es válido o ya venció.</p>
+      <a class="btn-primary" href="recuperar.html">Pedir un enlace nuevo</a>
+    </div>
+
+    <div id="listo" hidden>
+      <p class="msg-ok">¡Listo! Tu contraseña se actualizó. Ya podés iniciar sesión.</p>
+      <a class="btn-primary" id="irLogin" href="login-usuario.html">Ir a iniciar sesión</a>
+    </div>
+  </div>
+</main>
+
+<script src="resetpro-api.js"></script>
+<script src="restablecer.js"></script>
+</body>
+</html>

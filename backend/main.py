@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from . import models, security
+from . import email_utils, models, security
 from .database import database_url, get_engine, get_session_factory, raw_database_url
 from .routers import admin, archivos, auth, dietas, profesores, turnos, usuarios
 
@@ -28,6 +28,15 @@ if origenes:
         allow_methods=["*"], allow_headers=["*"],
     )
 
+@app.middleware("http")
+async def sin_cache_en_api(request, call_next):
+    """Las respuestas de la API son siempre en vivo: evita ver datos viejos por cache."""
+    response = await call_next(request)
+    if request.url.path.startswith("/api") and "cache-control" not in response.headers:
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 for r in (auth.router, usuarios.router, profesores.router, turnos.router,
           dietas.router, archivos.router, admin.router):
     app.include_router(r, prefix="/api")
@@ -47,6 +56,7 @@ def health():
         "motor": None,
         "usuarios": None,
         "variable_db": raw_database_url()[0] or "ninguna",
+        "email": email_utils.proveedor() or "no configurado (la recuperacion la atiende el administrador)",
         "jwt": security.secret_info()[1],
         "detalle": None,
     }

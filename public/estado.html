@@ -55,6 +55,8 @@
       html += fila("API (backend)", d.api === "ok" ? "OK · " + ms + " ms" : "Error", d.api === "ok" ? "ok" : "err");
       html += fila("Base de datos", d.db === "ok" ? "Conectada (" + (d.motor || "?") + ")" : "Sin conexión", d.db === "ok" ? "ok" : "err");
       if (d.usuarios !== null) html += fila("Alumnos cargados", d.usuarios);
+      html += fila("Variable de base de datos", d.variable_db, d.variable_db === "ninguna" ? "err" : "");
+      html += fila("Envío de emails", d.email);
       html += fila("Clave de sesión (JWT)", d.jwt);
       if (d.motor === "sqlite") html += fila("Aviso", "SQLite es solo para pruebas locales", "err");
       if (d.detalle) det.innerHTML = `<div class="detalle">${d.detalle.replace(/</g, "&lt;")}</div>`;

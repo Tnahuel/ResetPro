@@ -50,6 +50,34 @@ Esas contraseñas están en el repositorio, o sea que son públicas. Dos opcione
   `ADMIN_EMAIL`, `ADMIN_PASSWORD` (y opcional `ADMIN_NAME`). Si ya se cargaron los datos de ejemplo,
   vaciá la base en el SQL Editor de Neon (`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`) y hacé un Redeploy.
 
+## Recuperar contraseña
+
+En los dos logins, **¿Olvidaste tu contraseña?** lleva a `recuperar.html`. La persona ingresa su email y:
+
+- **Si configuraste el envío de emails**, recibe un enlace que vale 60 minutos y se usa una sola vez
+  (`restablecer.html`), donde crea su contraseña nueva. La respuesta es siempre la misma exista o no el email.
+- **Si no configuraste emails**, el pedido queda en el panel del administrador
+  (sección *Recuperación de contraseñas*) y desde ahí se genera un enlace de 24 horas
+  para enviárselo por WhatsApp o mail. El admin también puede generar uno en cualquier momento
+  con el botón **Enlace de clave** de la tabla de alumnos o de profesores.
+
+Para activar los emails, en Vercel (Settings → Environment Variables) definí **una** de estas opciones y hacé Redeploy:
+
+| Opción | Variables |
+|---|---|
+| Resend | `RESEND_API_KEY` y `MAIL_FROM` (con un dominio verificado en Resend) |
+| SMTP (Gmail con contraseña de aplicación, Brevo, etc.) | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` y `MAIL_FROM` |
+
+En `/estado.html` aparece si el envío de emails quedó configurado. Los enlaces se guardan en la base solo como hash
+(nunca el token), vencen y dejan de servir al usarse. Si olvida su clave el **único administrador**, otro admin le genera el enlace;
+por eso conviene tener dos cuentas de administrador.
+
+## Eliminar alumnos y profesores
+
+En el panel de administración, cada fila de **Estudiantes activos** y de **Profesores** tiene el botón **Eliminar** (con confirmación).
+Borrar un alumno elimina su cuenta, turnos, plan nutricional y PDFs. Borrar un profesor elimina su cuenta y los turnos que tenía asignados
+(el aviso muestra cuántos). No se puede deshacer.
+
 Variables opcionales: `JWT_SECRET_KEY` (si no está, se deriva de `DATABASE_URL`), `APP_TIMEZONE` (por defecto `America/Argentina/Cordoba`, define qué es "hoy" en los paneles).
 
 ## Qué hace cada panel

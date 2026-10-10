@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>ResetPro — Recuperar contraseña</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="recuperar.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="index.html">
+    <img src="icono.PNG" alt="ResetPro">
+    <span>RESETPRO</span>
+  </a>
+  <a class="back" href="index.html">Volver al inicio</a>
+</header>
+
+<main class="login-wrap">
+  <div class="login-card">
+    <div class="login-tag">RECUPERAR ACCESO</div>
+    <h1>¿Olvidaste tu contraseña?</h1>
+    <p class="sub">Ingresá el email de tu cuenta y te ayudamos a crear una nueva.</p>
+
+    <form id="recForm" novalidate>
+      <label for="email">Email de tu cuenta</label>
+      <input type="email" id="email" placeholder="tu@email.com" autocomplete="email" required>
+      <p class="error" id="recError"></p>
+      <button type="submit" class="btn-primary">Enviar enlace</button>
+    </form>
+
+    <p class="msg-ok" id="recOk" hidden></p>
+    <p class="msg-info" id="recInfo" hidden></p>
+
+    <div class="login-links">
+      <a id="linkLogin" href="login-usuario.html">Volver a iniciar sesión</a>
+    </div>
+  </div>
+</main>
+
+<script src="resetpro-api.js"></script>
+<script src="recuperar.js"></script>
+</body>
+</html>
