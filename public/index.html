@@ -16,20 +16,22 @@
     <a class="brand" href="#top">
       <img src="icono.PNG" alt="Icono de RESETPRO">
     </a>
-    <nav>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#como-funciona">Cómo funciona</a></li>
-        <li><a href="#roles">Para vos</a></li>
-        <li><a href="#nutricion">Nutrición</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-      </ul>
-    </nav>
-    <div class="nav-auth" id="navAuth">
-      <a href="login-usuario.html" aria-label="Ingresar como usuario">Ingresar (Usuario)</a>
-      <a href="login-profesor.html" aria-label="Ingresar como profesor">Ingresar (Profesor)</a>
+    <div class="nav-menu" id="navMenu">
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#roles">Para vos</a></li>
+          <li><a href="#nutricion">Nutrición</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+      <div class="nav-auth" id="navAuth">
+        <a href="login-usuario.html" aria-label="Ingresar como usuario">Ingresar (Usuario)</a>
+        <a href="login-profesor.html" aria-label="Ingresar como profesor">Ingresar (Profesor)</a>
+      </div>
+      <a class="nav-cta" id="navCta" href="#contacto">Reservá tu turno</a>
     </div>
-    <a class="nav-cta" id="navCta" href="#contacto">Reservá tu turno</a>
-    <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">☰</button>
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">☰</button>
   </div>
 </header>
 

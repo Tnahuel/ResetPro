@@ -88,27 +88,82 @@
     transition:background .2s ease, transform .2s ease;
   }
   .nav-cta:hover{background:#ffbe2e; transform:translateY(-1px);}
-  .menu-btn{display:none; background:none; border:0; color:var(--black); font-size:26px; cursor:pointer;}
+  .menu-btn{
+    display:none; border:0; cursor:pointer;
+    background:var(--black); color:var(--gold);
+    font-size:22px; line-height:1; width:44px; height:44px;
+    align-items:center; justify-content:center;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition:background .2s ease, color .2s ease;
+  }
+  .menu-btn:hover, .menu-btn[aria-expanded="true"]{background:var(--gold); color:var(--black);}
+  /* En escritorio el contenedor es "invisible" y el layout queda igual que antes */
+  .nav-menu{display:contents;}
+
   @media (max-width:860px){
-    .nav-links, .nav-cta, .nav-auth{display:none;}
-    .menu-btn{display:block;}
-    .nav-links.open{
-      display:flex; flex-direction:column; gap:0;
-      position:absolute; top:64px; left:0; right:0;
-      background:var(--white); border-bottom:1px solid rgba(11,11,12,0.08);
-      padding:8px 20px 16px;
+    .menu-btn{display:flex;}
+
+    /* Panel desplegable */
+    .nav-menu{
+      display:none;
+      position:absolute; top:100%; left:0; right:0;
+      flex-direction:column; gap:0;
+      background:linear-gradient(180deg, var(--charcoal) 0%, var(--black) 100%);
+      border-top:3px solid var(--gold);
+      padding:12px 24px 28px;
+      max-height:calc(100vh - 70px); overflow-y:auto;
+      box-shadow:0 24px 48px rgba(0,0,0,0.55);
     }
-    .nav-links.open a{padding:12px 0; border-bottom:1px solid rgba(11,11,12,0.08); color:var(--black);}
-    .nav-auth.open{
-      display:flex; gap:10px;
-      position:absolute; top:246px; left:20px; right:20px;
-      background:var(--white); padding:0 0 16px;
+    .nav-menu.open{display:flex; animation:menuIn .28s ease both;}
+    @keyframes menuIn{
+      from{opacity:0; transform:translateY(-10px);}
+      to{opacity:1; transform:translateY(0);}
     }
-    .nav-auth.open a{flex:1; text-align:center; background:var(--white);}
-    .nav-cta.open{
-      display:flex; justify-content:center;
-      position:absolute; top:310px; left:20px; right:20px;
+
+    /* Fondo oscuro detrás del panel */
+    header.menu-open::after{
+      content:""; position:absolute; top:100%; left:0; right:0; height:100vh;
+      background:rgba(0,0,0,0.6); z-index:-1;
     }
+
+    /* Links */
+    .nav-links{flex-direction:column; gap:0; flex-grow:0; counter-reset:item;}
+    .nav-links li{counter-increment:item;}
+    .nav-links a{
+      display:flex; align-items:center; gap:16px;
+      padding:18px 4px;
+      border-bottom:1px solid var(--line);
+      font-family:var(--font-display); font-weight:500;
+      font-size:21px; letter-spacing:0.6px; text-transform:uppercase;
+      color:var(--white);
+      transition:color .2s ease, padding-left .2s ease;
+    }
+    .nav-links a::before{
+      content:"0" counter(item);
+      font-size:13px; color:var(--gold); font-weight:600; letter-spacing:1px;
+    }
+    .nav-links a::after{
+      content:"→"; margin-left:auto; color:var(--gold);
+      opacity:0; transform:translateX(-6px);
+      transition:opacity .2s ease, transform .2s ease;
+    }
+    .nav-links a:hover, .nav-links a:active{color:var(--gold); padding-left:10px;}
+    .nav-links a:hover::after, .nav-links a:active::after{opacity:1; transform:translateX(0);}
+
+    /* Botones de ingreso */
+    .nav-auth{flex-direction:column; align-items:stretch; gap:10px; margin-top:26px;}
+    .nav-auth::before{
+      content:"Ingresar como"; font-size:12px; letter-spacing:1.6px; text-transform:uppercase;
+      color:var(--grey); font-weight:600; margin-bottom:2px;
+    }
+    .nav-auth a{
+      text-align:center; color:var(--white); background:var(--charcoal-2);
+      border:1px solid var(--line); padding:14px 16px; font-size:14.5px;
+    }
+    .nav-auth a:hover{border-color:var(--gold); background:rgba(242,169,0,0.10); color:var(--gold);}
+
+    /* CTA */
+    .nav-cta{justify-content:center; margin-top:18px; padding:16px 20px; font-size:15.5px;}
   }
 
   /* ---------- Hero ---------- */
