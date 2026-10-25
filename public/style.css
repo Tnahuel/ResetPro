@@ -201,10 +201,10 @@
   .btn-primary, .btn-secondary{
     font-family:var(--font-body);
     font-weight:600; font-size:15px;
-    padding:15px 180px;
+    padding:15px 26px;
     text-decoration:none;
     cursor:pointer;
-    border:center;
+    border:none;
   }
   .btn-primary{
     background:var(--gold); color:var(--black);
@@ -212,6 +212,8 @@
     transition:background .2s ease, transform .2s ease;
   }
   .btn-primary:hover{background:#ffbe2e; transform:translateY(-1px);}
+  /* largo, pero siempre dentro de su columna */
+  .hero-actions .btn-primary{flex:1 1 auto; max-width:480px; text-align:center;}
   .btn-secondary{
     background:transparent; color:var(--white);
     border:1px solid var(--line);
@@ -244,8 +246,9 @@
     font-family:var(--font-display); font-weight:500; font-size:15px; margin:0; color:var(--white);
   }
   .selector-card .sc-head .dot{width:8px; height:8px; background:var(--gold); border-radius:50%;}
-  .muscle-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .muscle-grid{display:flex; flex-wrap:wrap; justify-content:center; gap:10px;}
   .muscle-chip{
+    flex:0 0 calc(33.333% - 7px);
     border:1px solid var(--line);
     padding:14px 8px;
     text-align:center;
@@ -278,7 +281,7 @@
 
   /* Steps */
   .steps{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:0;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:0;
     border-top:1px solid var(--line); border-left:1px solid var(--line);
   }
   @media (max-width:800px){ .steps{grid-template-columns:1fr;} }
@@ -293,7 +296,7 @@
   .step p{color:var(--text-dim); font-size:15px; margin:0;}
 
   /* Role cards */
-  .roles{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+  .roles{display:grid; grid-template-columns:1fr; gap:24px; max-width:760px;}
   @media (max-width:860px){ .roles{grid-template-columns:1fr;} }
   .role-card{
     background:var(--charcoal);
@@ -394,30 +397,21 @@
     display:flex; align-items:center; justify-content:center;
     white-space:nowrap;       /* evita que el texto se corte en dos líneas */
   }
-
-.step{
-  text-align: center;
 }
 
-.num{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-  /*ICONO DE LA MANCUERNA*/
-.step-icon{
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 15px;
-}
-  /*ICONO DEL RELOG*/
-.step-icon-relog{ width: 50px;
-  height: 50px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 15px;
 
+/* ===== Pasos: iconos y texto centrado en TODOS los tamaños ===== */
+.step{text-align:center;}
+.num{display:flex; justify-content:center; align-items:center;}
+/*ICONO DE LA MANCUERNA*/
+.step-icon{width:70px; height:70px; object-fit:contain; display:block; margin:0 auto 15px;}
+/*ICONO DEL RELOJ*/
+.step-icon-relog{width:50px; height:50px; object-fit:contain; display:block; margin:0 auto 15px;}
+
+/* Computadora (2 columnas): los dos titulos quedan a la misma altura */
+@media (min-width:801px){
+  .step-icon-relog{margin-top:10px; margin-bottom:28px;}
 }
-}
+
+/* Que el menu fijo no tape el titulo al tocar un link del menu */
+section[id]{scroll-margin-top:80px;}
