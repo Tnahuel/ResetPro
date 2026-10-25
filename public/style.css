@@ -200,7 +200,7 @@
   .btn-primary, .btn-secondary{
     font-family:var(--font-body);
     font-weight:600; font-size:15px;
-    padding:15px 26px;
+    padding:15px 180px;
     text-decoration:none;
     cursor:pointer;
     border:none;
@@ -314,24 +314,22 @@
   .feature{
     display:grid; grid-template-columns:0.95fr 1.05fr; gap:56px; align-items:center;
   }
-  @media (max-width:900px){ .feature{grid-template-columns:1fr;} }
-  .macro-card{
-    background:var(--black);
-    border:1px solid var(--line);
-    padding:30px;
-  }
-  .macro-row{display:flex; align-items:center; gap:16px; margin-bottom:20px;}
-  .macro-row:last-child{margin-bottom:0;}
-  .macro-label{width:100px; font-size:13px; color:var(--text-dim); flex-shrink:0;}
-  .macro-bar{flex-grow:1; height:9px; background:var(--charcoal-2); position:relative; overflow:hidden;}
-  .macro-fill{position:absolute; left:0; top:0; bottom:0; background:var(--gold);}
-  .macro-val{width:56px; text-align:right; font-family:var(--font-display); font-size:14px; color:var(--white); flex-shrink:0;}
-  .feature-text h2{font-family:var(--font-display); font-weight:600; font-size:clamp(26px,3.4vw,36px); margin:0 0 18px; line-height:1.14;}
-  .feature-text p{color:var(--text-dim); font-size:16px; margin:0 0 24px; max-width:48ch;}
-  .check-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;}
-  .check-list li{display:flex; gap:12px; font-size:15px; align-items:flex-start;}
-  .check-list li .mark{color:var(--gold); font-family:var(--font-display); flex-shrink:0;}
+@media (max-width:900px){
+  .hero{padding:56px 0 64px;}
+  .hero .wrap{grid-template-columns:1fr; gap:0;}
+  .hero .wrap > div:first-child{display:contents;}
 
+  .hero h1{order:1; margin-bottom:16px;}
+  .hero p.lead{order:2; margin-bottom:24px;}
+  .hero-stats{order:3;}
+  .hero-visual{order:4; margin-bottom:24px;}
+  .hero-actions{order:5; margin:0;}
+  .hero-actions .btn-primary{flex:1; text-align:center;}
+
+  .hero-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 0 24px;}
+  .hero-stats div b{font-size:24px;}
+  .hero-stats div span{font-size:12px; line-height:1.3;}
+}
   /* CTA band */
   .cta-band{
     background:var(--gold); color:var(--black); text-align:center; padding:76px 0;
