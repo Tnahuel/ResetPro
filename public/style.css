@@ -395,7 +395,29 @@
     white-space:nowrap;       /* evita que el texto se corte en dos líneas */
   }
 
+.step{
+  text-align: center;
+}
 
+.num{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+  /*ICONO DE LA MANCUERNA*/
+.step-icon{
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 15px;
+}
+  /*ICONO DEL RELOG*/
+.step-icon-relog{ width: 60px;
+  height: 60px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 15px;
 
-  
+}
 }
