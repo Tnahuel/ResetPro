@@ -203,7 +203,7 @@
     padding:15px 180px;
     text-decoration:none;
     cursor:pointer;
-    border:none;
+    border:center;
   }
   .btn-primary{
     background:var(--gold); color:var(--black);
@@ -366,3 +366,31 @@
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; scroll-behavior:auto !important;}
   }
+
+  @media (max-width:900px){
+
+  /* título, párrafo y números 1 2 3 centrados */
+  .hero h1,
+  .hero p.lead{text-align:center;}
+  .hero p.lead{margin-left:auto; margin-right:auto;}
+  .hero-stats div{text-align:center;}
+
+  /* cuadro "Seleccioná tu grupo muscular" */
+  .selector-card .sc-head{justify-content:center; gap:10px;}
+
+  /* los cuadros Pecho / Espalda / Piernas / Hombros / Brazos centrados */
+  .muscle-grid{display:flex; flex-wrap:wrap; justify-content:center; gap:10px;}
+  .muscle-chip{flex:0 0 calc(33.333% - 7px);}   /* 3 por fila; los que sobran quedan en el centro */
+
+  /* profesor sugerido + horario */
+  .selector-card .sc-foot{justify-content:center; gap:20px;}
+
+  /* botón Reservá tu turno */
+  .hero-actions{justify-content:center;}
+  .hero-actions .btn-primary{
+    flex:0 1 100%;
+    max-width:360px;          /* si lo querés más ancho, subí este número */
+    display:flex; align-items:center; justify-content:center;
+    white-space:nowrap;       /* evita que el texto se corte en dos líneas */
+  }
+}
