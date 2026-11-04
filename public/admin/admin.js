@@ -280,8 +280,78 @@ async function cargarProfesores() {
   }
 }
 
+// ---------- Valoraciones de profesores ----------
+function estrellasHTML(n) {
+  const r = Math.max(0, Math.min(5, Math.round(n)));
+  return `<span class="st" role="img" aria-label="${r} de 5 estrellas"><span class="on">${"★".repeat(r)}</span>${"★".repeat(5 - r)}</span>`;
+}
+
+function histogramaHTML(dist) {
+  const max = Math.max(...dist, 1);
+  return `<div class="hist" role="img" aria-label="Votos de 1 a 5 estrellas: ${dist.join(", ")}">` +
+    dist.map((n, i) =>
+      `<div class="hist-col" title="${i + 1} estrella${i ? "s" : ""}: ${n} voto${n === 1 ? "" : "s"}">` +
+      `<div class="hist-bar${n ? "" : " cero"}" style="height:${n ? Math.max(8, Math.round((n / max) * 100)) : 0}%"></div>` +
+      `<small>${i + 1}★</small></div>`
+    ).join("") + `</div>`;
+}
+
+function promedioTexto(n) {
+  return n === null || n === undefined ? "–" : n.toFixed(1).replace(".", ",");
+}
+
+async function cargarValoraciones() {
+  const tbodyRes = document.getElementById("tbodyResumenVal");
+  const tbodyVotos = document.getElementById("tbodyVotos");
+  const filtro = document.getElementById("valFiltroProfesor");
+  const elegido = filtro.value;
+  try {
+    const d = await apiFetch("/admin/valoraciones" + (elegido ? "?profesor_id=" + encodeURIComponent(elegido) : ""));
+
+    document.getElementById("valPromedio").textContent = promedioTexto(d.promedio_general);
+    document.getElementById("valTotal").textContent = d.total_votos;
+
+    tbodyRes.innerHTML = d.resumen.length ? "" : `<tr><td colspan="4">Todavía no hay profesores registrados.</td></tr>`;
+    d.resumen.forEach((r) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(r.nombre))}</span>
+          <span>${escapeHTML(r.nombre)}<span class="cell-sub">${escapeHTML(r.especialidad || "")}</span></span></td>
+        <td>${r.promedio === null
+          ? `<span class="val-sin">Sin votos todavía</span>`
+          : `<span class="val-prom">${promedioTexto(r.promedio)}</span>${estrellasHTML(r.promedio)}`}</td>
+        <td>${r.votos}</td>
+        <td>${histogramaHTML(r.distribucion)}</td>`;
+      tbodyRes.appendChild(tr);
+    });
+
+    // El selector se arma con los profesores y conserva la opción elegida.
+    filtro.innerHTML = `<option value="">Todos los profesores</option>` +
+      d.resumen.map((r) => `<option value="${r.profesor_id}">${escapeHTML(r.nombre)}</option>`).join("");
+    if (elegido && d.resumen.some((r) => String(r.profesor_id) === elegido)) filtro.value = elegido;
+
+    tbodyVotos.innerHTML = d.votos.length ? "" : `<tr><td colspan="5">Todavía no hay votos${elegido ? " para este profesor" : ""}.</td></tr>`;
+    d.votos.forEach((v) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${v.turno_fecha ? escapeHTML(fechaTurno(v.turno_fecha, v.turno_hora || "")) : "—"}<span class="cell-sub">${escapeHTML(v.grupo_muscular || "")}</span></td>
+        <td>${escapeHTML(v.alumno)}</td>
+        <td>${escapeHTML(v.profesor)}</td>
+        <td>${estrellasHTML(v.estrellas)}<span class="cell-sub">${v.estrellas} de 5</span></td>
+        <td>${escapeHTML(fechaCorta(v.creado_en))}</td>`;
+      tbodyVotos.appendChild(tr);
+    });
+  } catch (e) {
+    const msg = `<tr><td colspan="5">No se pudieron cargar las valoraciones: ${escapeHTML(e.message)}</td></tr>`;
+    tbodyRes.innerHTML = msg;
+    tbodyVotos.innerHTML = msg;
+  }
+}
+
+document.getElementById("valFiltroProfesor").addEventListener("change", cargarValoraciones);
+
 function refrescarTodo() {
-  return Promise.all([cargarStats(), cargarEstudiantes(), cargarProfesores(), cargarSolicitudes()]);
+  return Promise.all([cargarStats(), cargarEstudiantes(), cargarProfesores(), cargarSolicitudes(), cargarValoraciones()]);
 }
 
 if (sesion) refrescarTodo();

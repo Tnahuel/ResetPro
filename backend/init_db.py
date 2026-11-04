@@ -104,8 +104,10 @@ def seed_demo(session) -> None:
 
     def turno(alumno, prof, fecha, hora, grupo):
         estado = models.EstadoTurnoEnum.completado if fecha < hoy else models.EstadoTurnoEnum.confirmado
-        session.add(models.Turno(usuario_id=alumno.id, profesor_id=prof.id, fecha=fecha,
-                                 rango_horario=hora, grupo_muscular=grupo, estado=estado))
+        t = models.Turno(usuario_id=alumno.id, profesor_id=prof.id, fecha=fecha,
+                         rango_horario=hora, grupo_muscular=grupo, estado=estado)
+        session.add(t)
+        return t
 
     # Semana completa de Sarah (lunes a sabado, 18:00 con Mariano)
     lunes = hoy - timedelta(days=hoy.weekday())
@@ -118,7 +120,30 @@ def seed_demo(session) -> None:
     turno(alumnos["lucas"], mariano, hoy, "21:00", "Core")
     turno(alumnos["julian"], mariano, hoy + timedelta(days=2), "19:00", "Espalda")
     turno(alumnos["valentina"], daniela, hoy + timedelta(days=1), "17:00", "Piernas")
-    turno(alumnos["nico"], ignacio, hoy - timedelta(days=3), "16:00", "Pecho")
+    turno_nico = turno(alumnos["nico"], ignacio, hoy - timedelta(days=3), "16:00", "Pecho")
+
+    # Turnos ya realizados, con su calificacion de 1 a 5 estrellas (alumno -> profesor), para que la
+    # pantalla "Valoraciones" del admin no arranque vacia. Solo el admin ve estos votos.
+    # Sarah queda con un turno realizado SIN calificar para poder probar el flujo del alumno.
+    session.flush()
+    session.add(models.Valoracion(turno_id=turno_nico.id, usuario_id=alumnos["nico"].id,
+                                  profesor_id=ignacio.id, estrellas=4))
+    pasados = [
+        # (alumno, profesor, hace cuantos dias, hora, grupo, estrellas o None)
+        ("julian", daniela, 5, "10:00", "Piernas", 5),
+        ("camila", daniela, 4, "11:00", "Hombro", 4),
+        ("lucas", ignacio, 6, "18:00", "Core", 3),
+        ("camila", mariano, 8, "19:00", "Brazos", 5),
+        ("lucas", mariano, 9, "20:00", "Pecho", 4),
+        ("valentina", ignacio, 7, "17:00", "Piernas", 2),
+        ("sarah", daniela, 8, "10:00", "Piernas", None),
+    ]
+    for clave, prof, dias, hora, grupo, estrellas in pasados:
+        t = turno(alumnos[clave], prof, hoy - timedelta(days=dias), hora, grupo)
+        if estrellas:
+            session.flush()
+            session.add(models.Valoracion(turno_id=t.id, usuario_id=alumnos[clave].id,
+                                          profesor_id=prof.id, estrellas=estrellas))
 
     session.add(models.Entrenamiento(usuario_id=alumnos["sarah"].id, profesor_id=mariano.id,
                                      fecha=hoy - timedelta(days=7), grupo_muscular="Espalda",

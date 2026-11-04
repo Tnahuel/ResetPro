@@ -104,6 +104,25 @@ class TurnoOut(BaseModel):
     reemplazados: int = 0
 
 
+class TurnoPorCalificar(BaseModel):
+    """Turno ya realizado que el alumno todavia no califico."""
+    turno_id: int
+    fecha: date
+    rango_horario: str
+    grupo_muscular: Optional[str] = None
+    profesor_nombre: str
+
+
+class ValoracionCreate(BaseModel):
+    turno_id: int
+    estrellas: int = Field(ge=1, le=5)
+
+
+class ValoracionOut(BaseModel):
+    turno_id: int
+    estrellas: int
+
+
 class ProfesorOut(BaseModel):
     id: int
     nombre: str

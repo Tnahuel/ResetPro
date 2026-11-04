@@ -67,6 +67,20 @@ CREATE INDEX ix_turnos_usuario ON turnos(usuario_id);
 CREATE INDEX ix_turnos_profesor ON turnos(profesor_id);
 CREATE INDEX ix_turnos_fecha ON turnos(fecha);
 
+-- Calificacion (1-5 estrellas) del alumno al profesor de un turno realizado. Solo la ve el administrador.
+-- (No confundir con turnos.nota, que es la nota 1-10 que el profesor le pone al alumno.)
+CREATE TABLE valoraciones (
+    id              SERIAL PRIMARY KEY,
+    turno_id        INTEGER NOT NULL UNIQUE REFERENCES turnos(id) ON DELETE CASCADE,
+    usuario_id      INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    profesor_id     INTEGER NOT NULL REFERENCES profesores(id) ON DELETE CASCADE,
+    estrellas       INTEGER NOT NULL,
+    creado_en       TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT ck_valoracion_estrellas CHECK (estrellas BETWEEN 1 AND 5)
+);
+CREATE INDEX ix_valoraciones_usuario ON valoraciones(usuario_id);
+CREATE INDEX ix_valoraciones_profesor ON valoraciones(profesor_id);
+
 CREATE TABLE entrenamientos (
     id              SERIAL PRIMARY KEY,
     usuario_id      INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,

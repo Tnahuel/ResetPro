@@ -217,3 +217,18 @@ tbody tr:last-child td{border-bottom:none;}
 .solicitud:last-child{border-bottom:none;}
 .solicitud .cell-sub{display:inline; margin-left:6px;}
 [hidden]{display:none !important;}
+
+/* --- Valoraciones de profesores --- */
+.val-stats{margin:0 0 24px;}
+.st{letter-spacing:2px; color:rgba(247,246,242,0.2); font-size:15px; white-space:nowrap;}
+.st.on{color:var(--gold);}
+.val-prom{display:inline-block; min-width:38px; font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--white); margin-right:8px;}
+.val-sin{color:var(--grey); font-size:13px;}
+.hist{display:flex; align-items:flex-end; gap:6px; height:56px;}
+.hist-col{display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px; height:100%; width:22px;}
+.hist-bar{width:100%; background:var(--gold); min-height:2px; opacity:.85;}
+.hist-bar.cero{background:rgba(247,246,242,0.12); opacity:1;}
+.hist-col small{font-size:10.5px; color:var(--grey); line-height:1;}
+.val-filtro{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:32px 0 10px;}
+.val-filtro .mini-list-label{margin:0;}
+.val-filtro select{width:auto; min-width:220px;}

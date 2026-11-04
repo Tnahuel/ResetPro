@@ -2,8 +2,8 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
-    Boolean, Column, Date, DateTime, Enum as SqlEnum, Float, ForeignKey, Integer,
-    LargeBinary, String,
+    Boolean, CheckConstraint, Column, Date, DateTime, Enum as SqlEnum, Float, ForeignKey,
+    Integer, LargeBinary, String,
 )
 from sqlalchemy.orm import deferred, relationship
 
@@ -114,6 +114,29 @@ class Turno(Base):
 
     usuario = relationship("Usuario", back_populates="turnos")
     profesor = relationship("Profesor", back_populates="turnos")
+
+
+class Valoracion(Base):
+    """Calificacion (1 a 5 estrellas) que un alumno le da al profesor de un turno ya realizado.
+
+    Es PRIVADA: solo la ve el administrador. A proposito NO hay relacion desde Profesor ni
+    Turno hacia esta tabla, y ningun endpoint de profesor la expone.
+    (No confundir con Turno.nota, que es la nota 1-10 que el profesor le pone al alumno.)
+    """
+    __tablename__ = "valoraciones"
+    __table_args__ = (CheckConstraint("estrellas BETWEEN 1 AND 5", name="ck_valoracion_estrellas"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    # unique: un turno se califica una sola vez
+    turno_id = Column(Integer, ForeignKey("turnos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=False, index=True)
+    profesor_id = Column(Integer, ForeignKey("profesores.id", ondelete="CASCADE"), nullable=False, index=True)
+    estrellas = Column(Integer, nullable=False)
+    creado_en = Column(DateTime, default=datetime.utcnow)
+
+    turno = relationship("Turno")
+    usuario = relationship("Usuario")
+    profesor = relationship("Profesor")
 
 
 class Entrenamiento(Base):

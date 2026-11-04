@@ -125,6 +125,89 @@ function pintarDieta(panel) {
   }
 }
 
+// ---------- Calificar al profesor (1 a 5 estrellas) ----------
+const TEXTO_ESTRELLAS = ["", "Malo", "Regular", "Bueno", "Muy bueno", "Excelente"];
+
+function itemValoracion(t) {
+  const id = t.turno_id;
+  const radios = [5, 4, 3, 2, 1].map((n) =>
+    `<input type="radio" name="est-${id}" id="est-${id}-${n}" value="${n}">` +
+    `<label for="est-${id}-${n}" title="${n} estrella${n > 1 ? "s" : ""}" aria-label="${n} estrella${n > 1 ? "s" : ""}">★</label>`
+  ).join("");
+  const detalle = [fechaLarga(t.fecha), t.rango_horario + " hs", t.grupo_muscular].filter(Boolean).join(" · ");
+  return `
+    <article class="rate-item" data-turno="${id}">
+      <div class="rate-info">
+        <b>${escapeHTML(t.profesor_nombre)}</b>
+        <span>${escapeHTML(detalle)}</span>
+      </div>
+      <div class="rate-controls">
+        <fieldset class="stars"><legend>Calificación de ${escapeHTML(t.profesor_nombre)}</legend>${radios}</fieldset>
+        <span class="stars-text" aria-live="polite"></span>
+        <button type="button" class="card-cta solid" disabled>Enviar calificación</button>
+      </div>
+    </article>`;
+}
+
+function pintarValoraciones(pendientes) {
+  const card = document.getElementById("cardValoracion");
+  const lista = document.getElementById("valoracionLista");
+  if (!pendientes.length) {
+    card.hidden = true;
+    lista.innerHTML = "";
+    return;
+  }
+  lista.innerHTML = pendientes.map(itemValoracion).join("");
+  card.hidden = false;
+
+  lista.querySelectorAll(".rate-item").forEach((item) => {
+    const turnoId = Number(item.dataset.turno);
+    const btn = item.querySelector("button");
+    const texto = item.querySelector(".stars-text");
+
+    item.querySelectorAll("input[type=radio]").forEach((r) =>
+      r.addEventListener("change", () => {
+        texto.textContent = TEXTO_ESTRELLAS[Number(r.value)];
+        btn.disabled = false;
+      })
+    );
+
+    btn.addEventListener("click", async () => {
+      const elegida = item.querySelector("input[type=radio]:checked");
+      if (!elegida) return;
+      btn.disabled = true;
+      try {
+        await apiFetch("/valoraciones", {
+          method: "POST",
+          body: JSON.stringify({ turno_id: turnoId, estrellas: Number(elegida.value) }),
+        });
+        item.innerHTML = `<p class="rate-done">¡Gracias! Enviaste tu calificación (${elegida.value} ★).</p>`;
+        setTimeout(() => {
+          item.remove();
+          if (!lista.querySelector(".rate-item")) card.hidden = true;
+        }, 2200);
+      } catch (e) {
+        // Si ya estaba calificado (409), simplemente se refresca la lista.
+        if (/ya calific/i.test(e.message)) {
+          cargarValoraciones();
+        } else {
+          mostrarAviso("No pudimos enviar tu calificación: " + e.message);
+          btn.disabled = false;
+        }
+      }
+    });
+  });
+}
+
+async function cargarValoraciones() {
+  try {
+    pintarValoraciones(await apiFetch("/valoraciones/pendientes"));
+  } catch (e) {
+    // La calificación es secundaria: si falla, no se muestra y el resto del panel sigue andando.
+    document.getElementById("cardValoracion").hidden = true;
+  }
+}
+
 async function cargar() {
   try {
     const panel = await apiFetch("/usuarios/" + sesion.id + "/panel");
@@ -140,4 +223,5 @@ async function cargar() {
 if (sesion) {
   pintarEncabezado(sesion.nombre);
   cargar();
+  cargarValoraciones();
 }

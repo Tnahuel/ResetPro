@@ -174,3 +174,35 @@ button.card-cta:disabled:hover{background:transparent; border-color:rgba(247,246
 .macro-note{margin:16px 0 0; font-size:12.5px; color:var(--grey);}
 .macro-note b{color:var(--white); font-weight:600;}
 .macro-val small{color:var(--grey); font-size:11px;}
+
+/* --- Calificacion del profesor (1 a 5 estrellas) --- */
+[hidden]{display:none !important;}
+.rating-card{grid-column:1 / -1;}
+.rate-item{
+  display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
+  padding:16px 0; border-top:1px solid var(--line);
+}
+.rate-item:first-child{border-top:none; padding-top:0;}
+.rate-info{display:flex; flex-direction:column; gap:3px; min-width:200px; flex:1 1 220px;}
+.rate-info b{font-size:15px; color:var(--white);}
+.rate-info span{font-size:13px; color:var(--grey);}
+.rate-controls{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+.rate-controls .card-cta{margin-top:0;}
+.rate-done{color:#8FD19E; font-size:14px; font-weight:600; padding:8px 0;}
+
+/* Estrellas con radios nativos: funcionan con teclado (flechas) y lectores de pantalla.
+   Van en orden 5..1 + row-reverse para pintar las estrellas anteriores al elegir o pasar el mouse. */
+.stars{display:flex; flex-direction:row-reverse; justify-content:flex-end; border:0; margin:0; padding:0;}
+.stars legend{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+.stars input{position:absolute; opacity:0; width:1px; height:1px;}
+.stars label{
+  font-size:34px; line-height:1; padding:2px 4px; cursor:pointer;
+  color:rgba(247,246,242,0.22); transition:color .12s ease, transform .12s ease;
+}
+.stars input:checked ~ label,
+.stars label:hover,
+.stars label:hover ~ label{color:var(--gold);}
+.stars label:hover{transform:scale(1.12);}
+.stars input:focus-visible + label{outline:2px solid var(--gold); outline-offset:2px;}
+.stars-text{font-size:13px; color:var(--grey); min-width:92px;}
+@media (max-width:560px){ .stars label{font-size:38px; padding:2px 5px;} }

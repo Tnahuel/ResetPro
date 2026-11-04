@@ -1,5 +1,6 @@
 import secrets
 from datetime import datetime, timedelta
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
@@ -198,6 +199,67 @@ def profesores_detalle(db: Session = Depends(get_db), _=Depends(require_role("ad
     return resultado
 
 
+# ---------------------------- Valoraciones de profesores ----------------------------
+@router.get("/valoraciones")
+def valoraciones(
+    profesor_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+    _=Depends(require_role("admin")),
+):
+    """Votos (1 a 5 estrellas) de los alumnos hacia sus profesores. SOLO administrador:
+    el profesor no tiene ningun endpoint que devuelva esto.
+
+    `resumen`: una fila por profesor (promedio, cantidad de votos y distribucion [n1..n5]).
+    `votos`: los ultimos 200 votos, opcionalmente filtrados por `profesor_id`."""
+    V = models.Valoracion
+    conteos = {}
+    for pid, estrellas, n in db.query(V.profesor_id, V.estrellas, func.count(V.id)).group_by(V.profesor_id, V.estrellas).all():
+        conteos.setdefault(pid, [0] * 5)[estrellas - 1] = n
+
+    resumen = []
+    for p in db.query(models.Profesor).order_by(models.Profesor.nombre).all():
+        dist = conteos.get(p.id, [0] * 5)
+        votos = sum(dist)
+        resumen.append({
+            "profesor_id": p.id,
+            "nombre": p.nombre,
+            "especialidad": p.especialidad,
+            "votos": votos,
+            "promedio": round(sum((i + 1) * n for i, n in enumerate(dist)) / votos, 2) if votos else None,
+            "distribucion": dist,
+        })
+    # Mejor promedio primero; los que todavia no tienen votos, al final.
+    resumen.sort(key=lambda r: (r["promedio"] is None, -(r["promedio"] or 0), -r["votos"], r["nombre"]))
+
+    consulta = (
+        db.query(V)
+        .options(joinedload(V.turno), joinedload(V.usuario), joinedload(V.profesor))
+        .order_by(V.creado_en.desc(), V.id.desc())
+    )
+    if profesor_id is not None:
+        consulta = consulta.filter(V.profesor_id == profesor_id)
+    votos = [{
+        "id": v.id,
+        "estrellas": v.estrellas,
+        "creado_en": v.creado_en.isoformat() + "Z" if v.creado_en else None,
+        "alumno": v.usuario.nombre if v.usuario else "—",
+        "profesor_id": v.profesor_id,
+        "profesor": v.profesor.nombre if v.profesor else "—",
+        "turno_fecha": v.turno.fecha.isoformat() if v.turno else None,
+        "turno_hora": v.turno.rango_horario if v.turno else None,
+        "grupo_muscular": v.turno.grupo_muscular if v.turno else None,
+    } for v in consulta.limit(200).all()]
+
+    total = sum(r["votos"] for r in resumen)
+    suma = sum(r["promedio"] * r["votos"] for r in resumen if r["promedio"] is not None)
+    return {
+        "total_votos": total,
+        "promedio_general": round(suma / total, 2) if total else None,
+        "resumen": resumen,
+        "votos": votos,
+    }
+
+
 # ---------------------------- Eliminar ----------------------------
 @router.delete("/usuarios/{usuario_id}")
 def eliminar_usuario(usuario_id: int, db: Session = Depends(get_db), _=Depends(require_role("admin"))):
@@ -208,6 +270,7 @@ def eliminar_usuario(usuario_id: int, db: Session = Depends(get_db), _=Depends(r
     nombre, cred_id = u.nombre, u.credenciales_id
 
     eliminados = {}
+    db.query(models.Valoracion).filter(models.Valoracion.usuario_id == usuario_id).delete(synchronize_session=False)
     for etiqueta, modelo in (("turnos", models.Turno), ("archivos", models.Archivo),
                              ("dietas", models.Dieta), ("entrenamientos", models.Entrenamiento)):
         eliminados[etiqueta] = (
@@ -231,6 +294,7 @@ def eliminar_profesor(profesor_id: int, db: Session = Depends(get_db), _=Depends
     nombre, cred_id = p.nombre, p.credenciales_id
 
     eliminados = {}
+    db.query(models.Valoracion).filter(models.Valoracion.profesor_id == profesor_id).delete(synchronize_session=False)
     for etiqueta, modelo in (("turnos", models.Turno), ("entrenamientos", models.Entrenamiento)):
         eliminados[etiqueta] = (
             db.query(modelo).filter(modelo.profesor_id == profesor_id).delete(synchronize_session=False)

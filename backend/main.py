@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from . import email_utils, models, security
 from .database import database_url, get_engine, get_session_factory, raw_database_url
-from .routers import admin, archivos, auth, dietas, profesores, turnos, usuarios
+from .routers import admin, archivos, auth, dietas, profesores, turnos, usuarios, valoraciones
 
 logging.basicConfig(level=logging.INFO)
 
@@ -38,7 +38,7 @@ async def sin_cache_en_api(request, call_next):
 
 
 for r in (auth.router, usuarios.router, profesores.router, turnos.router,
-          dietas.router, archivos.router, admin.router):
+          dietas.router, archivos.router, admin.router, valoraciones.router):
     app.include_router(r, prefix="/api")
 
 
