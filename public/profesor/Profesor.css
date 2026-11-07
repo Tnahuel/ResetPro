@@ -2,8 +2,8 @@
   --black:#0B0B0C;
   --charcoal:#18181B;
   --charcoal-2:#212124;
-  --gold:#F2A900;
-  --gold-dim:#B8830A;
+  --gold:#ebb840;
+  --gold-dim:#b79032;
   --white:#F7F6F2;
   --grey:#9A9A9F;
   --line: rgba(247,246,242,0.10);
@@ -56,7 +56,7 @@ header{
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   transition:border-color .2s ease, background .2s ease;
 }
-.logout:hover{border-color:var(--gold); background:rgba(242,169,0,0.15);}
+.logout:hover{border-color:var(--gold); background:rgba(235,184,64,0.15);}
 @media (max-width:560px){ .user-box .who{display:none;} }
 
 /* Greeting */
@@ -98,7 +98,7 @@ header{
   display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
   clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
 }
-.alumno-row.pending{border-color:rgba(242,169,0,0.35);}
+.alumno-row.pending{border-color:rgba(235,184,64,0.35);}
 .alumno-main{display:flex; align-items:center; gap:14px; min-width:200px;}
 .alumno-main .avatar{
   width:40px; height:40px; background:var(--gold); color:var(--black);
@@ -122,13 +122,13 @@ header{
   transition:border-color .2s ease, background .2s ease;
   white-space:nowrap;
 }
-.btn-cta:hover{border-color:var(--gold); background:rgba(242,169,0,0.08);}
+.btn-cta:hover{border-color:var(--gold); background:rgba(235,184,64,0.08);}
 .btn-cta.solid{background:var(--gold); color:var(--black); border-color:var(--gold);}
-.btn-cta.solid:hover{background:#ffbe2e;}
+.btn-cta.solid:hover{background:#eec25b;}
 
 .badge-pending{
   font-size:12px; color:var(--gold);
-  border:1px solid rgba(242,169,0,0.4);
+  border:1px solid rgba(235,184,64,0.4);
   padding:7px 12px;
 }
 
@@ -142,3 +142,6 @@ header{
 button.btn-cta{background:transparent; cursor:pointer; font-family:var(--font-body);}
 button.btn-cta.solid{background:var(--gold);}
 button.btn-cta:disabled{opacity:.55; cursor:wait;}
+
+/* El atributo hidden siempre oculta (las reglas display de .card y .card-cta lo pisaban) */
+[hidden]{display:none !important;}

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..deps import check_usuario_access, get_current_payload, get_db
 from ..serializers import turno_out
-from ..utils import hoy_local
+from ..utils import DIAS_PARA_VALORAR, hoy_local, turno_finalizado
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
@@ -112,6 +112,27 @@ def panel_usuario(usuario_id: int, db: Session = Depends(get_db), sesion: dict =
         )
         return {"id": a.id, "nombre": a.nombre} if a else None
 
+    # Turnos ya realizados que todavia no calificó. Un profesor que consulte el panel de un
+    # alumno NO recibe esta lista: asi no puede deducir quien voto y quien no.
+    por_valorar = []
+    if sesion.get("rol") != "profesor":
+        candidatos = (
+            db.query(models.Turno)
+            .outerjoin(models.Valoracion, models.Valoracion.turno_id == models.Turno.id)
+            .filter(
+                models.Turno.usuario_id == usuario_id,
+                models.Turno.estado != models.EstadoTurnoEnum.cancelado,
+                models.Turno.fecha >= hoy - timedelta(days=DIAS_PARA_VALORAR),
+                models.Turno.fecha <= hoy,
+                models.Valoracion.id.is_(None),
+            )
+            .order_by(models.Turno.fecha.desc(), models.Turno.rango_horario.desc()).all()
+        )
+        por_valorar = [
+            turno_out(t).model_dump(mode="json")
+            for t in candidatos if turno_finalizado(t.fecha, t.rango_horario)
+        ]
+
     return {
         "usuario": {"id": usuario.id, "nombre": usuario.nombre,
                     "grupo_muscular_actual": usuario.grupo_muscular_actual},
@@ -122,4 +143,5 @@ def panel_usuario(usuario_id: int, db: Session = Depends(get_db), sesion: dict =
         "dieta": schemas.DietaOut.model_validate(dieta).model_dump() if dieta else None,
         "rutina": ultimo_archivo("rutina"),
         "dieta_pdf": ultimo_archivo("dieta"),
+        "por_valorar": por_valorar,
     }

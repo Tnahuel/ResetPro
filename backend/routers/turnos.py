@@ -1,12 +1,14 @@
+from datetime import timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..deps import get_current_payload, get_db, require_role
 from ..serializers import turno_out
-from ..utils import hoy_local
+from ..utils import DIAS_PARA_VALORAR, hoy_local, turno_finalizado
 
 router = APIRouter(prefix="/turnos", tags=["turnos"])
 
@@ -94,3 +96,39 @@ def aceptar_turno(turno_id: int, db: Session = Depends(get_db), sesion: dict = D
     db.commit()
     db.refresh(turno)
     return turno_out(turno)
+
+
+@router.post("/{turno_id}/valorar")
+def valorar_turno(
+    turno_id: int,
+    payload: schemas.ValorarTurnoRequest,
+    db: Session = Depends(get_db),
+    sesion: dict = Depends(get_current_payload),
+):
+    """El alumno califica (1 a 5 estrellas) un turno que ya realizo. Un voto por turno.
+    Solo el alumno dueño del turno puede votar; el profesor nunca ve el resultado."""
+    if sesion.get("rol") != "usuario":
+        raise HTTPException(status_code=403, detail="Solo los alumnos pueden calificar sus turnos")
+
+    turno = db.get(models.Turno, turno_id)
+    if not turno or turno.usuario_id != sesion.get("perfil_id"):
+        raise HTTPException(status_code=404, detail="Turno no encontrado")
+    if turno.estado == models.EstadoTurnoEnum.cancelado:
+        raise HTTPException(status_code=400, detail="Ese turno fue cancelado")
+    if not turno_finalizado(turno.fecha, turno.rango_horario):
+        raise HTTPException(status_code=400, detail="Vas a poder calificar el turno cuando termine el entrenamiento")
+    if turno.fecha < hoy_local() - timedelta(days=DIAS_PARA_VALORAR):
+        raise HTTPException(status_code=400, detail="Ya pasó el plazo para calificar este turno")
+    if db.query(models.Valoracion.id).filter(models.Valoracion.turno_id == turno_id).first():
+        raise HTTPException(status_code=409, detail="Ya calificaste este turno")
+
+    db.add(models.Valoracion(
+        turno_id=turno.id, usuario_id=turno.usuario_id,
+        profesor_id=turno.profesor_id, estrellas=payload.estrellas,
+    ))
+    try:
+        db.commit()
+    except IntegrityError:   # dos toques simultaneos: el segundo no pisa al primero
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Ya calificaste este turno")
+    return {"ok": True, "estrellas": payload.estrellas}

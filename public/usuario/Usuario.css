@@ -2,8 +2,8 @@
     --black:#0B0B0C;
     --charcoal:#18181B;
     --charcoal-2:#212124;
-    --gold:#F2A900;
-    --gold-dim:#B8830A;
+    --gold:#ebb840;
+    --gold-dim:#b79032;
     --white:#F7F6F2;
     --grey:#9A9A9F;
     --line: rgba(247,246,242,0.10);
@@ -56,7 +56,7 @@
     clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
     transition:border-color .2s ease, background .2s ease;
   }
-  .logout:hover{border-color:var(--gold); background:rgba(242,169,0,0.15);}
+  .logout:hover{border-color:var(--gold); background:rgba(235,184,64,0.15);}
   @media (max-width:560px){
     .user-box .who{display:none;}
   }
@@ -86,7 +86,7 @@
   .card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
   .card-head .tag{font-size:12px; font-weight:600; letter-spacing:0.4px; color:var(--gold);}
   .card-head .icon{
-    width:30px; height:30px; border:1px solid rgba(242,169,0,0.35);
+    width:30px; height:30px; border:1px solid rgba(235,184,64,0.35);
     display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:14px;
     flex-shrink:0;
   }
@@ -102,11 +102,11 @@
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
     transition:border-color .2s ease, background .2s ease;
   }
-  .card-cta:hover{border-color:var(--gold); background:rgba(242,169,0,0.08);}
+  .card-cta:hover{border-color:var(--gold); background:rgba(235,184,64,0.08);}
   .card-cta.solid{
     background:var(--gold); color:var(--black); border-color:var(--gold);
   }
-  .card-cta.solid:hover{background:#ffbe2e;}
+  .card-cta.solid:hover{background:#eec25b;}
 
   /* Card 1: weekly training */
   .week-strip{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:22px;}
@@ -116,7 +116,7 @@
   }
   .day-chip .d{display:block; font-size:10.5px; color:var(--grey); margin-bottom:6px; letter-spacing:0.3px;}
   .day-chip .m{display:block; font-size:10.5px; color:var(--text-dim,var(--grey)); font-weight:600;}
-  .day-chip.today{border-color:var(--gold); background:rgba(242,169,0,0.10);}
+  .day-chip.today{border-color:var(--gold); background:rgba(235,184,64,0.10);}
   .day-chip.today .d, .day-chip.today .m{color:var(--gold);}
   .today-block{
     border-top:1px solid var(--line); padding-top:18px;
@@ -175,34 +175,30 @@ button.card-cta:disabled:hover{background:transparent; border-color:rgba(247,246
 .macro-note b{color:var(--white); font-weight:600;}
 .macro-val small{color:var(--grey); font-size:11px;}
 
-/* --- Calificacion del profesor (1 a 5 estrellas) --- */
-[hidden]{display:none !important;}
-.rating-card{grid-column:1 / -1;}
-.rate-item{
-  display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;
-  padding:16px 0; border-top:1px solid var(--line);
-}
-.rate-item:first-child{border-top:none; padding-top:0;}
-.rate-info{display:flex; flex-direction:column; gap:3px; min-width:200px; flex:1 1 220px;}
-.rate-info b{font-size:15px; color:var(--white);}
-.rate-info span{font-size:13px; color:var(--grey);}
-.rate-controls{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
-.rate-controls .card-cta{margin-top:0;}
-.rate-done{color:#8FD19E; font-size:14px; font-weight:600; padding:8px 0;}
 
-/* Estrellas con radios nativos: funcionan con teclado (flechas) y lectores de pantalla.
-   Van en orden 5..1 + row-reverse para pintar las estrellas anteriores al elegir o pasar el mouse. */
-.stars{display:flex; flex-direction:row-reverse; justify-content:flex-end; border:0; margin:0; padding:0;}
-.stars legend{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
-.stars input{position:absolute; opacity:0; width:1px; height:1px;}
-.stars label{
-  font-size:34px; line-height:1; padding:2px 4px; cursor:pointer;
-  color:rgba(247,246,242,0.22); transition:color .12s ease, transform .12s ease;
+/* --- Encuesta de estrellas --- */
+.rating-card{margin-top:28px;}
+.rating-card .sub{margin-bottom:8px;}
+.rate-item{display:flex; align-items:center; gap:14px 28px; flex-wrap:wrap; padding:16px 0; border-top:1px solid var(--line);}
+.rate-info{flex:1 1 220px; min-width:0;}
+.rate-info b{display:block; font-size:15px;}
+.rate-info span{display:block; font-size:13px; color:var(--grey); margin-top:2px;}
+.stars{display:flex; gap:2px;}
+.star{-webkit-tap-highlight-color:transparent; background:none; border:0; padding:0; min-width:44px; min-height:44px; font-size:34px; line-height:1; color:#3a3a40; cursor:pointer; transition:transform .12s ease, color .12s ease;}
+.star.on{color:var(--gold);}
+.star:hover{transform:scale(1.12);}
+.rate-item .rate-send{margin-top:0;}
+.rate-msg{flex-basis:100%; margin:0; font-size:13px; color:var(--grey);}
+.rate-msg:empty{display:none;}
+.rate-msg.err{color:#F26A6A;}
+.rate-thanks{margin:0; padding:6px 0; color:#8FD19E; font-weight:600;}
+@media (max-width:560px){
+  .rate-item{flex-direction:column; align-items:stretch;}
+  .stars{justify-content:center;}
+  .rate-info{flex:0 0 auto; text-align:center;}   /* sin esto, el flex-basis de 220px se vuelve ALTURA en columna */
+  .rate-item .rate-send{width:100%;}
 }
-.stars input:checked ~ label,
-.stars label:hover,
-.stars label:hover ~ label{color:var(--gold);}
-.stars label:hover{transform:scale(1.12);}
-.stars input:focus-visible + label{outline:2px solid var(--gold); outline-offset:2px;}
-.stars-text{font-size:13px; color:var(--grey); min-width:92px;}
-@media (max-width:560px){ .stars label{font-size:38px; padding:2px 5px;} }
+
+/* El atributo hidden siempre oculta (las reglas display de .card y .card-cta lo pisaban) */
+[hidden]{display:none !important;}
+.star:focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:4px;}

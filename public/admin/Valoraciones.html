@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ResetPro — Valoraciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="Admin.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="Admin.html">
+      <img src="../icono.PNG" alt="ResetPro">
+      <span>RESETPRO</span>
+    </a>
+    <a class="nav-link" href="Admin.html">← Panel</a>
+    <div class="user-box">
+      <div class="avatar" id="userAvatar">··</div>
+      <div class="who">
+        <b id="userName">Cargando...</b>
+        <small>Cuenta administrador</small>
+      </div>
+      <a class="logout" id="btnSalir" href="../index.html">Salir</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="greeting">
+    <h1>Valoraciones de los alumnos</h1>
+    <p>Calificación de 1 a 5 estrellas que cada alumno le da a su turno con el profesor. Solo el administrador puede verla: los profesores no.</p>
+  </div>
+
+  <p class="notice" id="aviso" hidden></p>
+
+  <div class="stats-row">
+    <div class="stat-chip"><b id="statPromedio">–</b><span>Promedio</span></div>
+    <div class="stat-chip"><b id="statVotos">–</b><span>Votos</span></div>
+    <div class="stat-chip"><b id="statProfes">–</b><span>Profesores con votos</span></div>
+  </div>
+
+  <section class="card full">
+    <div class="card-head">
+      <h2>Filtros</h2>
+      <p>Las fechas corresponden al día del turno.</p>
+    </div>
+    <form id="filtros" class="filtros-form" novalidate>
+      <div class="field">
+        <label for="fProfe">Profesor</label>
+        <select id="fProfe"><option value="">Todos</option></select>
+      </div>
+      <div class="field">
+        <label for="fDesde">Desde</label>
+        <input type="date" id="fDesde">
+      </div>
+      <div class="field">
+        <label for="fHasta">Hasta</label>
+        <input type="date" id="fHasta">
+      </div>
+      <button type="submit" class="btn-primary">Aplicar</button>
+      <button type="button" class="btn-ghost" id="btnLimpiar">Limpiar</button>
+    </form>
+  </section>
+
+  <section class="card full">
+    <div class="card-head">
+      <h2>Ranking de profesores</h2>
+      <p>Tocá un profesor para ver solo sus votos.</p>
+    </div>
+    <div class="rank-grid" id="ranking"><p class="hint">Cargando...</p></div>
+  </section>
+
+  <section class="card full">
+    <div class="card-head">
+      <h2>Detalle de votos</h2>
+      <p id="detalleSub">Del más reciente al más antiguo.</p>
+    </div>
+    <div class="table-wrap">
+      <table id="tablaVotos">
+        <thead>
+          <tr>
+            <th>Turno</th>
+            <th>Alumno</th>
+            <th>Profesor</th>
+            <th>Grupo muscular</th>
+            <th>Calificación</th>
+            <th>Votó el</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyVotos"><tr><td colspan="6">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script src="../resetpro-api.js"></script>
+<script src="valoraciones.js"></script>
+</body>
+</html>
