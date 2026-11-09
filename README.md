@@ -20,7 +20,7 @@ El front y la API viven en el mismo dominio, así que no hace falta configurar C
 └── public/                el sitio (index, logins, paneles usuario/profesor/admin, estado.html)
 ```
 
-## Desplegar en Vercel (3 pasos)
+## Desplegar en Vercel (3 pasos)    
 
 1. **Subí el repo a GitHub** (todo en la raíz del repositorio, tal cual está acá).
 2. En Vercel: **Add New → Project**, importá el repo y dejá todo por defecto
