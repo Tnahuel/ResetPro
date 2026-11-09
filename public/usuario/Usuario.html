@@ -36,17 +36,6 @@
 
   <p class="notice" id="aviso" hidden></p>
 
-  <!-- Calificar entrenamientos ya realizados (solo aparece si hay alguno pendiente) -->
-  <section class="card rating-card" id="valorarSeccion" hidden>
-    <div class="card-head">
-      <span class="tag">TU OPINIÓN</span>
-      <span class="icon">⭐</span>
-    </div>
-    <h2>¿Cómo te fue en tu entrenamiento?</h2>
-    <p class="sub">Calificá de 1 a 5 estrellas tus sesiones. Tu calificación es privada: tu profesor no la ve.</p>
-    <div id="valorarLista"></div>
-  </section>
-
   <div class="cards">
 
     <!-- Entrenamiento de la semana -->
@@ -94,6 +83,17 @@
         <p class="empty">Cargando...</p>
       </div>
       <button type="button" class="card-cta" id="btnDieta" disabled>Plan completo no disponible</button>
+    </section>
+
+    <!-- Calificar entrenamientos realizados (solo se muestra si hay turnos por calificar) -->
+    <section class="card rating-card" id="cardValoracion" hidden>
+      <div class="card-head">
+        <span class="tag">TU OPINIÓN</span>
+        <span class="icon">⭐</span>
+      </div>
+      <h2>¿Cómo te fue en tu entrenamiento?</h2>
+      <p class="sub">Calificá a tu profesor de 1 a 5 estrellas.</p>
+      <div class="card-body" id="valoracionLista"></div>
     </section>
 
   </div>

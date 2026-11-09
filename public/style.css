@@ -2,14 +2,12 @@
     --black:#0B0B0C;
     --charcoal:#18181B;
     --charcoal-2:#212124;
-    --gold:#ebb840;
-    --gold-hover:#eec25b;
-    --gold-dim:#b79032;
+    --gold:#F2A900;
+    --gold-dim:#B8830A;
     --white:#F7F6F2;
     --grey:#9A9A9F;
     --line: rgba(247,246,242,0.10);
     --font-display:'Oswald', sans-serif;
-    --font-title:'Montserrat', sans-serif;   /* titulos grandes */
     --font-body:'Inter', sans-serif;
   }
   :root:not([data-theme="light"]){
@@ -79,7 +77,7 @@
     transition:border-color .2s ease, background .2s ease;
     white-space:nowrap;
   }
-  .nav-auth a:hover{border-color:var(--gold); background:rgba(235,184,64,0.15);}
+  .nav-auth a:hover{border-color:var(--gold); background:rgba(242,169,0,0.15);}
   .nav-cta{
     display:inline-flex; align-items:center; gap:8px;
     background:var(--gold); color:var(--black);
@@ -89,7 +87,7 @@
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
     transition:background .2s ease, transform .2s ease;
   }
-  .nav-cta:hover{background:var(--gold-hover); transform:translateY(-1px);}
+  .nav-cta:hover{background:#ffbe2e; transform:translateY(-1px);}
   .menu-btn{
     display:none; border:0; cursor:pointer;
     background:var(--black); color:var(--gold);
@@ -163,7 +161,7 @@
       text-align:center; color:var(--white); background:var(--charcoal-2);
       border:1px solid var(--line); padding:14px 16px; font-size:14.5px;
     }
-    .nav-auth a:hover{border-color:var(--gold); background:rgba(235,184,64,0.10); color:var(--gold);}
+    .nav-auth a:hover{border-color:var(--gold); background:rgba(242,169,0,0.10); color:var(--gold);}
 
     /* CTA */
     .nav-cta{justify-content:center; margin-top:18px; padding:16px 20px; font-size:15.5px;}
@@ -186,12 +184,11 @@
     .hero{padding:56px 0 64px;}
   }
   .hero h1{
-    font-family:var(--font-title);
-    font-weight:700;
-    font-size:clamp(30px, 4.4vw, 54px);
-    line-height:1.12;
-    letter-spacing:-0.01em;
-    overflow-wrap:break-word;
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(38px, 5.4vw, 64px);
+    line-height:1.04;
+    letter-spacing:0.2px;
     margin:0 0 22px;
   }
   .hero p.lead{
@@ -214,7 +211,7 @@
     clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
     transition:background .2s ease, transform .2s ease;
   }
-  .btn-primary:hover{background:var(--gold-hover); transform:translateY(-1px);}
+  .btn-primary:hover{background:#ffbe2e; transform:translateY(-1px);}
   /* largo, pero siempre dentro de su columna */
   .hero-actions .btn-primary{flex:1 1 auto; max-width:480px; text-align:center;}
   .btn-secondary{
@@ -223,7 +220,7 @@
     clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
     transition:border-color .2s ease, background .2s ease;
   }
-  .btn-secondary:hover{border-color:var(--gold); background:rgba(235,184,64,0.06);}
+  .btn-secondary:hover{border-color:var(--gold); background:rgba(242,169,0,0.06);}
 
   .hero-stats{
     display:flex; gap:36px; margin-top:48px; flex-wrap:wrap;
@@ -259,7 +256,7 @@
     background:var(--charcoal-2);
   }
   .muscle-chip.active{
-    border-color:var(--gold); color:var(--gold); background:rgba(235,184,64,0.08);
+    border-color:var(--gold); color:var(--gold); background:rgba(242,169,0,0.08);
   }
   .selector-card .sc-foot{
     margin-top:20px; padding-top:18px; border-top:1px solid var(--line);
@@ -269,16 +266,15 @@
   .avatar{width:34px; height:34px; background:var(--gold); color:var(--black); font-family:var(--font-display); font-weight:600; display:flex; align-items:center; justify-content:center; font-size:14px;}
   .selector-card .sc-foot small{display:block; color:var(--text-dim); font-size:11.5px;}
   .selector-card .sc-foot p{margin:2px 0 0; font-size:13.5px; font-weight:600;}
-  .slot{font-size:12px; color:var(--gold); border:1px solid rgba(235,184,64,0.35); padding:6px 10px;}
+  .slot{font-size:12px; color:var(--gold); border:1px solid rgba(242,169,0,0.35); padding:6px 10px;}
 
   /* ---------- Section shared ---------- */
   section{padding:88px 0;}
   @media (max-width:640px){ section{padding:60px 0;} }
   .section-head{max-width:640px; margin-bottom:56px;}
   .section-head h2{
-    font-family:var(--font-title); font-weight:700;
-    font-size:clamp(24px,3.2vw,36px); line-height:1.2; letter-spacing:-0.01em;
-    overflow-wrap:break-word; margin:0 0 16px;
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(28px,3.6vw,40px); line-height:1.12; margin:0 0 16px;
   }
   .section-head p{color:var(--text-dim); font-size:16px; margin:0; max-width:52ch;}
   .alt{background:var(--bg-alt);}
@@ -343,8 +339,7 @@
     background:var(--gold); color:var(--black); text-align:center; padding:76px 0;
   }
   .cta-band h2{
-    font-family:var(--font-title); font-weight:700; font-size:clamp(26px,4vw,42px); margin:0 0 18px; line-height:1.15;
-    letter-spacing:-0.01em; overflow-wrap:break-word;
+    font-family:var(--font-display); font-weight:700; font-size:clamp(30px,4.4vw,46px); margin:0 0 18px; line-height:1.08;
   }
   .cta-band p{font-size:16.5px; margin:0 0 34px; color:#3b2c00; max-width:52ch; margin-left:auto; margin-right:auto;}
   .btn-dark{
@@ -420,9 +415,3 @@
 
 /* Que el menu fijo no tape el titulo al tocar un link del menu */
 section[id]{scroll-margin-top:80px;}
-
-
-/* Montserrat es mas ancha que Oswald: en celular el titulo principal se achica un poco para que entre */
-@media (max-width:640px){
-  .hero h1{font-size:clamp(28px,8vw,34px);}
-}

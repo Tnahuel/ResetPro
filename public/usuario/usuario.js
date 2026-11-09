@@ -125,70 +125,87 @@ function pintarDieta(panel) {
   }
 }
 
-// ---------- Encuesta de 1 a 5 estrellas por turno realizado ----------
-function pintarValoraciones(panel) {
-  const seccion = document.getElementById("valorarSeccion");
-  const lista = document.getElementById("valorarLista");
-  const pendientes = panel.por_valorar || [];
-  lista.innerHTML = "";
-  seccion.hidden = !pendientes.length;
-  pendientes.forEach((t) => lista.appendChild(crearItemValoracion(t, panel.hoy)));
+// ---------- Calificar al profesor (1 a 5 estrellas) ----------
+const TEXTO_ESTRELLAS = ["", "Malo", "Regular", "Bueno", "Muy bueno", "Excelente"];
+
+function itemValoracion(t) {
+  const id = t.turno_id;
+  const radios = [5, 4, 3, 2, 1].map((n) =>
+    `<input type="radio" name="est-${id}" id="est-${id}-${n}" value="${n}">` +
+    `<label for="est-${id}-${n}" title="${n} estrella${n > 1 ? "s" : ""}" aria-label="${n} estrella${n > 1 ? "s" : ""}">★</label>`
+  ).join("");
+  const detalle = [fechaLarga(t.fecha), t.rango_horario + " hs", t.grupo_muscular].filter(Boolean).join(" · ");
+  return `
+    <article class="rate-item" data-turno="${id}">
+      <div class="rate-info">
+        <b>${escapeHTML(t.profesor_nombre)}</b>
+        <span>${escapeHTML(detalle)}</span>
+      </div>
+      <div class="rate-controls">
+        <fieldset class="stars"><legend>Calificación de ${escapeHTML(t.profesor_nombre)}</legend>${radios}</fieldset>
+        <span class="stars-text" aria-live="polite"></span>
+        <button type="button" class="card-cta solid" disabled>Enviar calificación</button>
+      </div>
+    </article>`;
 }
 
-function crearItemValoracion(t, hoyIso) {
-  let valor = 0;
-  const cuando = t.fecha === hoyIso ? "Hoy" : fechaLarga(t.fecha);
-  const item = document.createElement("div");
-  item.className = "rate-item";
-  item.innerHTML = `
-    <div class="rate-info">
-      <b>${escapeHTML(t.profesor_nombre)}</b>
-      <span>${escapeHTML(cuando)} · ${escapeHTML(t.rango_horario)}${t.grupo_muscular ? " · " + escapeHTML(t.grupo_muscular) : ""}</span>
-    </div>
-    <div class="stars" role="radiogroup" aria-label="Calificación de 1 a 5 estrellas">
-      ${[1, 2, 3, 4, 5].map((n) =>
-        `<button type="button" class="star" role="radio" aria-checked="false" data-v="${n}" aria-label="${n} ${n === 1 ? "estrella" : "estrellas"}">★</button>`
-      ).join("")}
-    </div>
-    <button type="button" class="card-cta solid rate-send" disabled>Enviar</button>
-    <p class="rate-msg" role="status"></p>`;
+function pintarValoraciones(pendientes) {
+  const card = document.getElementById("cardValoracion");
+  const lista = document.getElementById("valoracionLista");
+  if (!pendientes.length) {
+    card.hidden = true;
+    lista.innerHTML = "";
+    return;
+  }
+  lista.innerHTML = pendientes.map(itemValoracion).join("");
+  card.hidden = false;
 
-  const estrellas = [...item.querySelectorAll(".star")];
-  const enviar = item.querySelector(".rate-send");
-  const msg = item.querySelector(".rate-msg");
-  const pintar = (hasta) => estrellas.forEach((s) => s.classList.toggle("on", Number(s.dataset.v) <= hasta));
+  lista.querySelectorAll(".rate-item").forEach((item) => {
+    const turnoId = Number(item.dataset.turno);
+    const btn = item.querySelector("button");
+    const texto = item.querySelector(".stars-text");
 
-  estrellas.forEach((s) => {
-    s.addEventListener("click", () => {
-      valor = Number(s.dataset.v);
-      pintar(valor);
-      estrellas.forEach((x) => x.setAttribute("aria-checked", String(Number(x.dataset.v) === valor)));
-      enviar.disabled = false;
-      msg.textContent = "";
+    item.querySelectorAll("input[type=radio]").forEach((r) =>
+      r.addEventListener("change", () => {
+        texto.textContent = TEXTO_ESTRELLAS[Number(r.value)];
+        btn.disabled = false;
+      })
+    );
+
+    btn.addEventListener("click", async () => {
+      const elegida = item.querySelector("input[type=radio]:checked");
+      if (!elegida) return;
+      btn.disabled = true;
+      try {
+        await apiFetch("/valoraciones", {
+          method: "POST",
+          body: JSON.stringify({ turno_id: turnoId, estrellas: Number(elegida.value) }),
+        });
+        item.innerHTML = `<p class="rate-done">¡Gracias! Enviaste tu calificación (${elegida.value} ★).</p>`;
+        setTimeout(() => {
+          item.remove();
+          if (!lista.querySelector(".rate-item")) card.hidden = true;
+        }, 2200);
+      } catch (e) {
+        // Si ya estaba calificado (409), simplemente se refresca la lista.
+        if (/ya calific/i.test(e.message)) {
+          cargarValoraciones();
+        } else {
+          mostrarAviso("No pudimos enviar tu calificación: " + e.message);
+          btn.disabled = false;
+        }
+      }
     });
-    s.addEventListener("mouseenter", () => pintar(Number(s.dataset.v)));
   });
-  item.querySelector(".stars").addEventListener("mouseleave", () => pintar(valor));
+}
 
-  enviar.addEventListener("click", async () => {
-    if (!valor) return;
-    enviar.disabled = true;
-    enviar.textContent = "Enviando...";
-    try {
-      await apiFetch("/turnos/" + t.id + "/valorar", { method: "POST", body: JSON.stringify({ estrellas: valor }) });
-      item.innerHTML = `<p class="rate-thanks">¡Gracias por tu calificación! ${"★".repeat(valor)}</p>`;
-      setTimeout(() => {
-        item.remove();
-        if (!document.querySelector("#valorarLista .rate-item")) document.getElementById("valorarSeccion").hidden = true;
-      }, 2200);
-    } catch (e) {
-      msg.textContent = e.message;
-      msg.classList.add("err");
-      enviar.disabled = false;
-      enviar.textContent = "Enviar";
-    }
-  });
-  return item;
+async function cargarValoraciones() {
+  try {
+    pintarValoraciones(await apiFetch("/valoraciones/pendientes"));
+  } catch (e) {
+    // La calificación es secundaria: si falla, no se muestra y el resto del panel sigue andando.
+    document.getElementById("cardValoracion").hidden = true;
+  }
 }
 
 async function cargar() {
@@ -198,7 +215,6 @@ async function cargar() {
     pintarSemana(panel);
     pintarTurno(panel);
     pintarDieta(panel);
-    pintarValoraciones(panel);
   } catch (e) {
     mostrarAviso("No pudimos cargar tu panel: " + e.message);
   }
@@ -207,4 +223,5 @@ async function cargar() {
 if (sesion) {
   pintarEncabezado(sesion.nombre);
   cargar();
+  cargarValoraciones();
 }

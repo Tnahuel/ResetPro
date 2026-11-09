@@ -2,8 +2,8 @@
   --black:#0B0B0C;
   --charcoal:#18181B;
   --charcoal-2:#212124;
-  --gold:#ebb840;
-  --gold-dim:#b79032;
+  --gold:#F2A900;
+  --gold-dim:#B8830A;
   --white:#F7F6F2;
   --grey:#9A9A9F;
   --line: rgba(247,246,242,0.10);
@@ -101,7 +101,7 @@ input:focus{border-color:var(--gold);}
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition:background .2s ease, transform .2s ease;
 }
-.btn-primary:hover{background:#eec25b; transform:translateY(-1px);}
+.btn-primary:hover{background:#ffbe2e; transform:translateY(-1px);}
 .btn-primary:disabled{opacity:0.7; cursor:default; transform:none;}
 
 .login-links{

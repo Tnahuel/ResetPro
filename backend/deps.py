@@ -8,11 +8,11 @@ from .database import get_session_factory
 from .security import decode_access_token
 
 log = logging.getLogger("resetpro")
-bearer_scheme = HTTPBearer(auto_error=False) 
+bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_db():
-    """Sesion por request. La primera vez crea las   tablas y carga los  datos de ejemplo."""
+    """Sesion por request. La primera vez crea las tablas y carga los datos de ejemplo."""
     try:
         from .init_db import init_once
         init_once()

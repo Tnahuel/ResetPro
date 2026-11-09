@@ -2,8 +2,8 @@
   --black:#0B0B0C;
   --charcoal:#18181B;
   --charcoal-2:#212124;
-  --gold:#ebb840;
-  --gold-dim:#b79032;
+  --gold:#F2A900;
+  --gold-dim:#B8830A;
   --white:#F7F6F2;
   --grey:#9A9A9F;
   --line: rgba(247,246,242,0.10);
@@ -56,7 +56,7 @@ header{
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   transition:border-color .2s ease, background .2s ease;
 }
-.logout:hover{border-color:var(--gold); background:rgba(235,184,64,0.15);}
+.logout:hover{border-color:var(--gold); background:rgba(242,169,0,0.15);}
 @media (max-width:560px){ .user-box .who{display:none;} }
 
 /* Greeting */
@@ -137,7 +137,7 @@ select{appearance:none; -webkit-appearance:none;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition:background .2s ease, transform .2s ease;
 }
-.btn-primary:hover{background:#eec25b; transform:translateY(-1px);}
+.btn-primary:hover{background:#ffbe2e; transform:translateY(-1px);}
 
 /* Mini list (created accounts / assigned turns) */
 .mini-list{margin-top:20px; padding-top:18px; border-top:1px solid var(--line);}
@@ -148,7 +148,7 @@ select{appearance:none; -webkit-appearance:none;
 }
 .mini-item:last-child{border-bottom:none;}
 .mini-item .role-badge{
-  font-size:11px; color:var(--gold); border:1px solid rgba(235,184,64,0.35);
+  font-size:11px; color:var(--gold); border:1px solid rgba(242,169,0,0.35);
   padding:3px 8px; white-space:nowrap;
 }
 
@@ -187,7 +187,7 @@ tbody tr:last-child td{border-bottom:none;}
   border:1px solid transparent;
 }
 .status.active{color:#8FD19E; border-color:rgba(143,209,158,0.4); background:rgba(143,209,158,0.08);}
-.status.pending{color:var(--gold); border-color:rgba(235,184,64,0.4); background:rgba(235,184,64,0.08);}
+.status.pending{color:var(--gold); border-color:rgba(242,169,0,0.4); background:rgba(242,169,0,0.08);}
 .status.paused{color:var(--grey); border-color:var(--line); background:rgba(247,246,242,0.04);}
 
 :focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
@@ -200,16 +200,16 @@ tbody tr:last-child td{border-bottom:none;}
 .check-row input{width:auto; margin:0; accent-color:var(--gold);}
 .cell-sub{display:block; font-size:12px; color:var(--grey); margin-top:2px;}
 .file-link{background:none; border:none; padding:0; color:var(--gold); font:inherit; font-size:13.5px; cursor:pointer; text-align:left; text-decoration:underline; text-underline-offset:3px;}
-.file-link:hover{color:#eec25b;}
+.file-link:hover{color:#ffbe2e;}
 
 #tablaEstudiantes{min-width:1280px;}
 .acciones{display:flex; gap:8px; flex-wrap:nowrap;}
 .act-btn{background:transparent; color:var(--white); border:1px solid rgba(247,246,242,0.25); font:inherit; font-size:12.5px; font-weight:600; padding:7px 11px; cursor:pointer; white-space:nowrap; transition:border-color .2s ease, background .2s ease;}
-.act-btn:hover{border-color:var(--gold); background:rgba(235,184,64,0.08);}
+.act-btn:hover{border-color:var(--gold); background:rgba(242,169,0,0.08);}
 .act-btn.danger{color:#F26A6A; border-color:rgba(242,106,106,0.45);}
 .act-btn.danger:hover{border-color:#F26A6A; background:rgba(242,106,106,0.1);}
 .act-btn:disabled{opacity:.5; cursor:wait;}
-.enlace-box{margin-bottom:22px; padding:16px; border:1px solid rgba(235,184,64,0.4); background:rgba(235,184,64,0.05);}
+.enlace-box{margin-bottom:22px; padding:16px; border:1px solid rgba(242,169,0,0.4); background:rgba(242,169,0,0.05);}
 .enlace-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;}
 .enlace-row input{flex:1; min-width:220px;}
 .enlace-row .btn-primary{margin-top:0;}
@@ -218,36 +218,17 @@ tbody tr:last-child td{border-bottom:none;}
 .solicitud .cell-sub{display:inline; margin-left:6px;}
 [hidden]{display:none !important;}
 
-
-/* --- Acceso a Valoraciones en el encabezado --- */
-.nav-link{color:var(--white); text-decoration:none; font-size:14px; font-weight:600; padding:8px 14px; border:1px solid rgba(255,255,255,0.45); white-space:nowrap; transition:border-color .2s ease, background .2s ease;}
-.nav-link:hover, .nav-link.active{border-color:var(--gold); background:rgba(235,184,64,0.15);}
-@media (max-width:560px){ .nav-link{font-size:13px; padding:7px 10px;} .brand span{display:none;} .user-box{gap:10px;} }
-
-/* --- Pantalla de Valoraciones --- */
-.notice{margin:18px 0 0; padding:12px 16px; border:1px solid rgba(242,106,106,0.45); color:#F26A6A; font-size:14px; background:rgba(242,106,106,0.06);}
-.filtros-form{flex-direction:row; flex-wrap:wrap; align-items:flex-end; gap:14px;}
-.filtros-form .field{flex:1 1 170px; margin-bottom:0;}
-.filtros-form .btn-primary{margin-top:0;}
-.btn-ghost{background:transparent; color:var(--white); border:1px solid rgba(247,246,242,0.25); font:inherit; font-weight:600; font-size:14.5px; padding:13px 20px; cursor:pointer;}
-.btn-ghost:hover{border-color:var(--gold);}
-.rank-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px;}
-.rank-card{background:var(--charcoal-2); border:1px solid var(--line); padding:18px; cursor:pointer; text-align:left; color:inherit; font:inherit; transition:border-color .2s ease;}
-.rank-card:hover{border-color:rgba(235,184,64,0.5);}
-.rank-card.sel{border-color:var(--gold); background:rgba(235,184,64,0.07);}
-.rank-head{display:flex; align-items:center; gap:10px;}
-.rank-head .avatar{width:34px; height:34px; background:var(--gold); color:var(--black); font-family:var(--font-display); font-weight:600; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-.rank-head b{display:block; font-size:14.5px;}
-.rank-head small{color:var(--grey); font-size:12px;}
-.rank-score{display:flex; align-items:baseline; gap:10px; margin:14px 0 10px;}
-.rank-num{font-family:var(--font-display); font-size:30px; font-weight:600; color:var(--gold);}
-.stars-static{font-size:17px; letter-spacing:1px; white-space:nowrap;}
-.stars-static .on{color:var(--gold);}
-.stars-static .off{color:#3a3a40;}
-.dist-row{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--grey); margin-top:4px;}
-.dist-row .n{width:22px; flex-shrink:0;}
-.dist-bar{flex:1; height:6px; background:var(--charcoal); position:relative; overflow:hidden;}
-.dist-fill{position:absolute; left:0; top:0; bottom:0; background:var(--gold);}
-.dist-row .c{width:26px; text-align:right; flex-shrink:0;}
-.sin-votos{color:var(--grey); font-size:13px; margin:14px 0 4px;}
-#tablaVotos{min-width:760px;}
+/* --- Valoraciones de profesores --- */
+.val-stats{margin:0 0 24px;}
+.st{letter-spacing:2px; color:rgba(247,246,242,0.2); font-size:15px; white-space:nowrap;}
+.st.on{color:var(--gold);}
+.val-prom{display:inline-block; min-width:38px; font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--white); margin-right:8px;}
+.val-sin{color:var(--grey); font-size:13px;}
+.hist{display:flex; align-items:flex-end; gap:6px; height:56px;}
+.hist-col{display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:3px; height:100%; width:22px;}
+.hist-bar{width:100%; background:var(--gold); min-height:2px; opacity:.85;}
+.hist-bar.cero{background:rgba(247,246,242,0.12); opacity:1;}
+.hist-col small{font-size:10.5px; color:var(--grey); line-height:1;}
+.val-filtro{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:32px 0 10px;}
+.val-filtro .mini-list-label{margin:0;}
+.val-filtro select{width:auto; min-width:220px;}
