@@ -116,6 +116,29 @@ class Turno(Base):
     profesor = relationship("Profesor", back_populates="turnos")
 
 
+class Valoracion(Base):
+    """Calificacion (1 a 5 estrellas) que un alumno le da al profesor de un turno ya realizado.
+
+    Es PRIVADA: solo la ve el administrador. A proposito NO hay relacion desde Profesor ni
+    Turno hacia esta tabla, y ningun endpoint de profesor la expone.
+    (No confundir con Turno.nota, que es la nota 1-10 que el profesor le pone al alumno.)
+    """
+    __tablename__ = "valoraciones"
+    __table_args__ = (CheckConstraint("estrellas BETWEEN 1 AND 5", name="ck_valoracion_estrellas"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    # unique: un turno se califica una sola vez
+    turno_id = Column(Integer, ForeignKey("turnos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=False, index=True)
+    profesor_id = Column(Integer, ForeignKey("profesores.id", ondelete="CASCADE"), nullable=False, index=True)
+    estrellas = Column(Integer, nullable=False)
+    creado_en = Column(DateTime, default=datetime.utcnow)
+
+    turno = relationship("Turno")
+    usuario = relationship("Usuario")
+    profesor = relationship("Profesor")
+
+
 class Entrenamiento(Base):
     __tablename__ = "entrenamientos"
 
@@ -160,17 +183,3 @@ class Recuperacion(Base):
     origen = Column(String(20), default="usuario")  # "usuario" (olvide mi clave) | "admin"
 
     credenciales = relationship("Credenciales")
-
-
-class Valoracion(Base):
-    """Encuesta de 1 a 5 estrellas que el alumno hace por cada turno realizado.
-    La ve SOLO el administrador: ningun endpoint de profesor la expone."""
-    __tablename__ = "valoraciones"
-    __table_args__ = (CheckConstraint("estrellas BETWEEN 1 AND 5", name="ck_valoraciones_estrellas"),)
-
-    id = Column(Integer, primary_key=True, index=True)
-    turno_id = Column(Integer, ForeignKey("turnos.id", ondelete="CASCADE"), unique=True, nullable=False)  # 1 voto por turno
-    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), nullable=False, index=True)
-    profesor_id = Column(Integer, ForeignKey("profesores.id", ondelete="CASCADE"), nullable=False, index=True)
-    estrellas = Column(Integer, nullable=False)
-    creado_en = Column(DateTime, default=datetime.utcnow)

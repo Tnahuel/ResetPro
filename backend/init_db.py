@@ -112,9 +112,8 @@ def seed_demo(session) -> None:
     # Semana completa de Sarah (lunes a sabado, 18:00 con Mariano)
     lunes = hoy - timedelta(days=hoy.weekday())
     semana = ["Pecho", "Espalda", "Piernas", "Hombro", "Brazos", "Core"]
-    turnos_sarah = []
     for i, grupo in enumerate(semana):
-        turnos_sarah.append(turno(alumnos["sarah"], mariano, lunes + timedelta(days=i), "18:00", grupo))
+        turno(alumnos["sarah"], mariano, lunes + timedelta(days=i), "18:00", grupo)
 
     turno(alumnos["julian"], mariano, hoy, "19:00", "Piernas")
     turno(alumnos["camila"], mariano, hoy, "20:00", "Hombro")
@@ -123,18 +122,32 @@ def seed_demo(session) -> None:
     turno(alumnos["valentina"], daniela, hoy + timedelta(days=1), "17:00", "Piernas")
     turno_nico = turno(alumnos["nico"], ignacio, hoy - timedelta(days=3), "16:00", "Pecho")
 
+    # Turnos ya realizados, con su calificacion de 1 a 5 estrellas (alumno -> profesor), para que la
+    # pantalla "Valoraciones" del admin no arranque vacia. Solo el admin ve estos votos.
+    # Sarah queda con un turno realizado SIN calificar para poder probar el flujo del alumno.
+    session.flush()
+    session.add(models.Valoracion(turno_id=turno_nico.id, usuario_id=alumnos["nico"].id,
+                                  profesor_id=ignacio.id, estrellas=4))
+    pasados = [
+        # (alumno, profesor, hace cuantos dias, hora, grupo, estrellas o None)
+        ("julian", daniela, 5, "10:00", "Piernas", 5),
+        ("camila", daniela, 4, "11:00", "Hombro", 4),
+        ("lucas", ignacio, 6, "18:00", "Core", 3),
+        ("camila", mariano, 8, "19:00", "Brazos", 5),
+        ("lucas", mariano, 9, "20:00", "Pecho", 4),
+        ("valentina", ignacio, 7, "17:00", "Piernas", 2),
+        ("sarah", daniela, 8, "10:00", "Piernas", None),
+    ]
+    for clave, prof, dias, hora, grupo, estrellas in pasados:
+        t = turno(alumnos[clave], prof, hoy - timedelta(days=dias), hora, grupo)
+        if estrellas:
+            session.flush()
+            session.add(models.Valoracion(turno_id=t.id, usuario_id=alumnos[clave].id,
+                                          profesor_id=prof.id, estrellas=estrellas))
+
     session.add(models.Entrenamiento(usuario_id=alumnos["sarah"].id, profesor_id=mariano.id,
                                      fecha=hoy - timedelta(days=7), grupo_muscular="Espalda",
                                      notas="Sesion completa"))
-    session.flush()
-
-    # Valoraciones de ejemplo (solo las ve el administrador)
-    pasados_sarah = [t for t in turnos_sarah if t.fecha < hoy]
-    if pasados_sarah:
-        session.add(models.Valoracion(turno_id=pasados_sarah[0].id, usuario_id=alumnos["sarah"].id,
-                                      profesor_id=mariano.id, estrellas=5))
-    session.add(models.Valoracion(turno_id=turno_nico.id, usuario_id=alumnos["nico"].id,
-                                  profesor_id=ignacio.id, estrellas=4))
 
     def rutina(alumno, clave):
         nombre, b64 = PDFS[clave]
