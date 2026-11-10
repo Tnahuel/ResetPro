@@ -89,10 +89,10 @@ def plantilla_recuperacion(nombre: str, enlace: str, minutos: int):
     n, e = html.escape(nombre), html.escape(enlace, quote=True)
     cuerpo = f"""<div style="background:#0B0B0C;padding:32px 16px;font-family:Arial,Helvetica,sans-serif">
   <div style="max-width:480px;margin:0 auto;background:#18181B;padding:32px;color:#F7F6F2">
-    <h2 style="margin:0 0 16px;color:#F2A900">ResetPro</h2>
+    <h2 style="margin:0 0 16px;color:#ebb840">ResetPro</h2>
     <p style="margin:0 0 12px">Hola {n},</p>
     <p style="margin:0 0 24px;color:#C8C8CC">Recibimos un pedido para crear una nueva contraseña. El enlace vale {minutos} minutos y se usa una sola vez.</p>
-    <p style="margin:0 0 24px"><a href="{e}" style="background:#F2A900;color:#0B0B0C;text-decoration:none;font-weight:bold;padding:14px 24px;display:inline-block">Crear nueva contraseña</a></p>
+    <p style="margin:0 0 24px"><a href="{e}" style="background:#ebb840;color:#0B0B0C;text-decoration:none;font-weight:bold;padding:14px 24px;display:inline-block">Crear nueva contraseña</a></p>
     <p style="margin:0;color:#9A9A9F;font-size:13px">Si no fuiste vos, ignorá este mensaje: tu contraseña actual sigue funcionando.</p>
   </div>
 </div>"""

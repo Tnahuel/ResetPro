@@ -72,7 +72,7 @@ function pintarVotos(data) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHTML(fechaTurno(v.fecha_turno, v.hora))}</td>
-      <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(v.alumno))}</span>${escapeHTML(v.alumno)}</td>
+      <td class="who-cell"><div class="who-flex"><span class="avatar">${escapeHTML(iniciales(v.alumno))}</span>${escapeHTML(v.alumno)}</div></td>
       <td>${escapeHTML(v.profesor)}</td>
       <td>${escapeHTML(v.grupo_muscular || "—")}</td>
       <td>${estrellasHTML(v.estrellas)} <span class="cell-sub" style="display:inline">${v.estrellas}/5</span></td>

@@ -2,8 +2,8 @@
     --black:#0B0B0C;
     --charcoal:#18181B;
     --charcoal-2:#212124;
-    --gold:#F2A900;
-    --gold-dim:#B8830A;
+    --gold:#ebb840;
+    --gold-dim:#b79032;
     --white:#F7F6F2;
     --grey:#9A9A9F;
     --line: rgba(247,246,242,0.10);
@@ -56,7 +56,7 @@
     clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
     transition:border-color .2s ease, background .2s ease;
   }
-  .logout:hover{border-color:var(--gold); background:rgba(242,169,0,0.15);}
+  .logout:hover{border-color:var(--gold); background:rgba(235,184,64,0.15);}
   @media (max-width:560px){
     .user-box .who{display:none;}
   }
@@ -86,7 +86,7 @@
   .card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
   .card-head .tag{font-size:12px; font-weight:600; letter-spacing:0.4px; color:var(--gold);}
   .card-head .icon{
-    width:30px; height:30px; border:1px solid rgba(242,169,0,0.35);
+    width:30px; height:30px; border:1px solid rgba(235,184,64,0.35);
     display:flex; align-items:center; justify-content:center; color:var(--gold); font-size:14px;
     flex-shrink:0;
   }
@@ -102,11 +102,11 @@
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
     transition:border-color .2s ease, background .2s ease;
   }
-  .card-cta:hover{border-color:var(--gold); background:rgba(242,169,0,0.08);}
+  .card-cta:hover{border-color:var(--gold); background:rgba(235,184,64,0.08);}
   .card-cta.solid{
     background:var(--gold); color:var(--black); border-color:var(--gold);
   }
-  .card-cta.solid:hover{background:#ffbe2e;}
+  .card-cta.solid:hover{background:#f1c765;}
 
   /* Card 1: weekly training */
   .week-strip{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:22px;}
@@ -116,7 +116,7 @@
   }
   .day-chip .d{display:block; font-size:10.5px; color:var(--grey); margin-bottom:6px; letter-spacing:0.3px;}
   .day-chip .m{display:block; font-size:10.5px; color:var(--text-dim,var(--grey)); font-weight:600;}
-  .day-chip.today{border-color:var(--gold); background:rgba(242,169,0,0.10);}
+  .day-chip.today{border-color:var(--gold); background:rgba(235,184,64,0.10);}
   .day-chip.today .d, .day-chip.today .m{color:var(--gold);}
   .today-block{
     border-top:1px solid var(--line); padding-top:18px;

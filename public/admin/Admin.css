@@ -2,8 +2,8 @@
   --black:#0B0B0C;
   --charcoal:#18181B;
   --charcoal-2:#212124;
-  --gold:#F2A900;
-  --gold-dim:#B8830A;
+  --gold:#ebb840;
+  --gold-dim:#b79032;
   --white:#F7F6F2;
   --grey:#9A9A9F;
   --line: rgba(247,246,242,0.10);
@@ -56,7 +56,7 @@ header{
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   transition:border-color .2s ease, background .2s ease;
 }
-.logout:hover{border-color:var(--gold); background:rgba(242,169,0,0.15);}
+.logout:hover{border-color:var(--gold); background:rgba(235,184,64,0.15);}
 @media (max-width:560px){ .user-box .who{display:none;} }
 
 /* Greeting */
@@ -137,7 +137,7 @@ select{appearance:none; -webkit-appearance:none;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   transition:background .2s ease, transform .2s ease;
 }
-.btn-primary:hover{background:#ffbe2e; transform:translateY(-1px);}
+.btn-primary:hover{background:#f1c765; transform:translateY(-1px);}
 
 /* Mini list (created accounts / assigned turns) */
 .mini-list{margin-top:20px; padding-top:18px; border-top:1px solid var(--line);}
@@ -148,7 +148,7 @@ select{appearance:none; -webkit-appearance:none;
 }
 .mini-item:last-child{border-bottom:none;}
 .mini-item .role-badge{
-  font-size:11px; color:var(--gold); border:1px solid rgba(242,169,0,0.35);
+  font-size:11px; color:var(--gold); border:1px solid rgba(235,184,64,0.35);
   padding:3px 8px; white-space:nowrap;
 }
 
@@ -176,7 +176,8 @@ tbody td{
   padding:14px 12px; border-bottom:1px solid var(--line); font-size:14px;
 }
 tbody tr:last-child td{border-bottom:none;}
-.who-cell{display:flex; align-items:center; gap:10px; font-weight:600;}
+.who-cell{font-weight:600;}
+.who-flex{display:flex; align-items:center; gap:10px; min-width:0;}
 .who-cell .avatar{
   width:30px; height:30px; background:var(--gold); color:var(--black);
   font-family:var(--font-display); font-weight:600; font-size:12px;
@@ -187,7 +188,7 @@ tbody tr:last-child td{border-bottom:none;}
   border:1px solid transparent;
 }
 .status.active{color:#8FD19E; border-color:rgba(143,209,158,0.4); background:rgba(143,209,158,0.08);}
-.status.pending{color:var(--gold); border-color:rgba(242,169,0,0.4); background:rgba(242,169,0,0.08);}
+.status.pending{color:var(--gold); border-color:rgba(235,184,64,0.4); background:rgba(235,184,64,0.08);}
 .status.paused{color:var(--grey); border-color:var(--line); background:rgba(247,246,242,0.04);}
 
 :focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
@@ -200,16 +201,16 @@ tbody tr:last-child td{border-bottom:none;}
 .check-row input{width:auto; margin:0; accent-color:var(--gold);}
 .cell-sub{display:block; font-size:12px; color:var(--grey); margin-top:2px;}
 .file-link{background:none; border:none; padding:0; color:var(--gold); font:inherit; font-size:13.5px; cursor:pointer; text-align:left; text-decoration:underline; text-underline-offset:3px;}
-.file-link:hover{color:#ffbe2e;}
+.file-link:hover{color:#f1c765;}
 
 #tablaEstudiantes{min-width:1280px;}
 .acciones{display:flex; gap:8px; flex-wrap:nowrap;}
 .act-btn{background:transparent; color:var(--white); border:1px solid rgba(247,246,242,0.25); font:inherit; font-size:12.5px; font-weight:600; padding:7px 11px; cursor:pointer; white-space:nowrap; transition:border-color .2s ease, background .2s ease;}
-.act-btn:hover{border-color:var(--gold); background:rgba(242,169,0,0.08);}
+.act-btn:hover{border-color:var(--gold); background:rgba(235,184,64,0.08);}
 .act-btn.danger{color:#F26A6A; border-color:rgba(242,106,106,0.45);}
 .act-btn.danger:hover{border-color:#F26A6A; background:rgba(242,106,106,0.1);}
 .act-btn:disabled{opacity:.5; cursor:wait;}
-.enlace-box{margin-bottom:22px; padding:16px; border:1px solid rgba(242,169,0,0.4); background:rgba(242,169,0,0.05);}
+.enlace-box{margin-bottom:22px; padding:16px; border:1px solid rgba(235,184,64,0.4); background:rgba(235,184,64,0.05);}
 .enlace-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;}
 .enlace-row input{flex:1; min-width:220px;}
 .enlace-row .btn-primary{margin-top:0;}
@@ -232,3 +233,40 @@ tbody tr:last-child td{border-bottom:none;}
 .val-filtro{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:32px 0 10px;}
 .val-filtro .mini-list-label{margin:0;}
 .val-filtro select{width:auto; min-width:220px;}
+
+/* ================= Responsive: tablas como tarjetas en celular ================= */
+@media (max-width:720px){
+  .card{padding:22px 16px;}
+  .card.full{margin-top:28px;}
+  .table-wrap{overflow:visible;}
+  table, #tablaEstudiantes{min-width:0; width:100%; border-collapse:separate;}
+  table thead{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+  table, table tbody, table tr, table td{display:block; width:100%;}
+  tbody tr{
+    background:var(--charcoal-2); border:1px solid var(--line);
+    padding:6px 14px; margin-bottom:12px;
+  }
+  tbody tr:last-child{margin-bottom:0;}
+  tbody td, tbody tr:last-child td{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:10px 0; border-bottom:1px solid var(--line); text-align:right;
+    min-width:0; overflow-wrap:anywhere;
+  }
+  tbody td:last-child, tbody tr:last-child td:last-child{border-bottom:none;}
+  tbody td[data-label]::before{
+    content:attr(data-label); flex:0 0 auto; max-width:42%;
+    font-size:11px; font-weight:600; color:var(--grey);
+    text-transform:uppercase; letter-spacing:0.3px; text-align:left;
+  }
+  /* primera celda (persona): cabecera de la tarjeta, sin etiqueta */
+  tbody tr td.who-cell{justify-content:flex-start; text-align:left; padding-top:12px;}
+  tbody tr td.who-cell::before{display:none;}
+  .who-flex{flex:1;}
+  /* mensajes vacíos / de error (colspan) */
+  tbody td[colspan]{display:block; text-align:left; border-bottom:none; color:var(--grey);}
+  tbody td .cell-sub{margin-top:0; text-align:inherit;}
+  .who-flex .cell-sub{margin-top:2px;}
+  td .acciones{flex-wrap:wrap; justify-content:flex-end;}
+  td .hist{justify-content:flex-end;}
+  .val-filtro select{width:100%; min-width:0;}
+}

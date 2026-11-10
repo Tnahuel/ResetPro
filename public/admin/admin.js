@@ -225,8 +225,8 @@ async function cargarEstudiantes() {
         : "—";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(e.nombre))}</span>
-          <span>${escapeHTML(e.nombre)}<span class="cell-sub">${escapeHTML(e.email || "")}</span></span></td>
+        <td class="who-cell"><div class="who-flex"><span class="avatar">${escapeHTML(iniciales(e.nombre))}</span>
+          <span>${escapeHTML(e.nombre)}<span class="cell-sub">${escapeHTML(e.email || "")}</span></span></div></td>
         <td>${escapeHTML(e.grupo_muscular || "—")}</td>
         <td>${escapeHTML((t && t.profesor) || "—")}</td>
         <td>${turnoHTML}</td>
@@ -263,8 +263,8 @@ async function cargarProfesores() {
         : "";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(p.nombre))}</span>
-          <span>${escapeHTML(p.nombre)}<span class="cell-sub">${escapeHTML(p.email || "")}</span></span></td>
+        <td class="who-cell"><div class="who-flex"><span class="avatar">${escapeHTML(iniciales(p.nombre))}</span>
+          <span>${escapeHTML(p.nombre)}<span class="cell-sub">${escapeHTML(p.email || "")}</span></span></div></td>
         <td>${escapeHTML(p.especialidad || "—")}</td>
         <td>${p.turnos_proximos}<span class="cell-sub">${p.alumnos_proximos} alumno${p.alumnos_proximos === 1 ? "" : "s"}</span></td>
         <td>${p.activo_semana ? "● " : ""}${escapeHTML(fechaCorta(p.ultimo_acceso))}</td>
@@ -315,8 +315,8 @@ async function cargarValoraciones() {
     d.resumen.forEach((r) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td class="who-cell"><span class="avatar">${escapeHTML(iniciales(r.nombre))}</span>
-          <span>${escapeHTML(r.nombre)}<span class="cell-sub">${escapeHTML(r.especialidad || "")}</span></span></td>
+        <td class="who-cell"><div class="who-flex"><span class="avatar">${escapeHTML(iniciales(r.nombre))}</span>
+          <span>${escapeHTML(r.nombre)}<span class="cell-sub">${escapeHTML(r.especialidad || "")}</span></span></div></td>
         <td>${r.promedio === null
           ? `<span class="val-sin">Sin votos todavía</span>`
           : `<span class="val-prom">${promedioTexto(r.promedio)}</span>${estrellasHTML(r.promedio)}`}</td>
