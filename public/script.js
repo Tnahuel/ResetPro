@@ -1,6 +1,8 @@
 const header = document.querySelector('header');
 const menuBtn = document.getElementById('menuBtn');
 const navMenu = document.getElementById('navMenu');
+const nombre = document.getElementById("nombre").value;
+const mensaje = `Hola mi nombre es ${nombre}, me gustaría sumarme a Reset Pro`;
 
 function setMenu(open){
   navMenu.classList.toggle('open', open);
@@ -23,3 +25,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(fals
 
 // Si se agranda la pantalla, resetear el estado
 window.addEventListener('resize', () => { if (window.innerWidth > 860) setMenu(false); });
+
+//Mensaje de usuario 
+const whatsappUrl = `https://wa.me/5493517668913?text=${encodeURIComponent(mensaje)}`;
